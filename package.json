@@ -55,7 +55,7 @@
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
-		"@clockworklabs/spacetimedb-sdk": "^1.0.2",
+		"@clockworklabs/spacetimedb-sdk": "^1.2.1",
 		"@inlang/paraglide-js": "^2.0.0",
 		"firebase": "^11.6.0"
 	}
