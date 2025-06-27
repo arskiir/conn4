@@ -219,7 +219,7 @@
 				>🏅 {m.just_maroon_insect_soar()}</a
 			>
 
-			<div class={useRooms.rooms ? 'space-y-2' : 'hidden'}>
+			<div class="space-y-2" class:hidden={!useRooms.rooms}>
 				<h2>{m.actual_gray_scallop_sway()} ({useRooms.rooms.length})</h2>
 				<ol class="space-y-1">
 					{#each useRooms.rooms as room (room.id)}
@@ -337,7 +337,8 @@
 				type="password"
 				name="password"
 				placeholder={m.enter_password_placeholder()}
-				class="input input-bordered w-full {passwordError ? 'input-error' : ''}"
+				class="input input-bordered w-full"
+				class:input-error={passwordError}
 				disabled={joiningWithPassword}
 				bind:value={passwordInput}
 			/>
