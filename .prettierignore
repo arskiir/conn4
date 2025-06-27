@@ -4,3 +4,9 @@ pnpm-lock.yaml
 yarn.lock
 bun.lock
 bun.lockb
+
+# Rust server directory
+server/
+
+# Auto-generated module bindings
+src/module_bindings/
