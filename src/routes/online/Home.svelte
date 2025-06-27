@@ -39,6 +39,7 @@
 	let roomToJoin = $state<Room | null>(null);
 	let passwordError = $state('');
 	let joiningWithPassword = $state(false);
+	let passwordInput = $state('');
 
 	function onNameSubmit(
 		e: SubmitEvent & {
@@ -118,8 +119,7 @@
 		event.preventDefault();
 		if (!roomToJoin) return;
 		
-		const formData = new FormData(event.currentTarget as HTMLFormElement);
-		const password = (formData.get('password') as string)?.trim();
+		const password = passwordInput.trim();
 		if (!password) return;
 		
 		passwordError = '';
@@ -133,6 +133,7 @@
 		passwordError = '';
 		roomToJoin = null;
 		joiningWithPassword = false;
+		passwordInput = '';
 	}
 	
 	function resetPasswordModal() {
@@ -140,6 +141,7 @@
 		passwordError = '';
 		roomToJoin = null;
 		joiningWithPassword = false;
+		passwordInput = '';
 	}
 
 	onDestroy(async () => {
@@ -328,13 +330,14 @@
 					placeholder={m.enter_password_placeholder()}
 					class="input input-bordered w-full {passwordError ? 'input-error' : ''}"
 					disabled={joiningWithPassword}
+					bind:value={passwordInput}
 				/>
 				{#if passwordError}
 					<p class="text-error text-sm">{passwordError}</p>
 				{/if}
 				<div class="modal-action">
 					<button type="button" class="btn" onclick={cancelPasswordJoin} disabled={joiningWithPassword}>{m.cancel()}</button>
-					<button type="submit" class="btn btn-primary" disabled={joiningWithPassword}>
+					<button type="submit" class="btn btn-primary" disabled={joiningWithPassword || !passwordInput.trim()}>
 						{#if joiningWithPassword}
 							<span class="loading loading-spinner loading-sm"></span>
 							{m.joining()}
