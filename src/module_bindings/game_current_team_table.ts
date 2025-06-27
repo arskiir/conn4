@@ -7,33 +7,33 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
-import { GameCurrentTeam } from "./game_current_team_type";
-import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
+import { GameCurrentTeam } from './game_current_team_type';
+import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from '.';
 
 /**
  * Table handle for the table `game_current_team`.
@@ -46,85 +46,90 @@ import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".
  * like `ctx.db.gameCurrentTeam.on_insert(...)`.
  */
 export class GameCurrentTeamTableHandle {
-  tableCache: TableCache<GameCurrentTeam>;
+	tableCache: TableCache<GameCurrentTeam>;
 
-  constructor(tableCache: TableCache<GameCurrentTeam>) {
-    this.tableCache = tableCache;
-  }
+	constructor(tableCache: TableCache<GameCurrentTeam>) {
+		this.tableCache = tableCache;
+	}
 
-  count(): number {
-    return this.tableCache.count();
-  }
+	count(): number {
+		return this.tableCache.count();
+	}
 
-  iter(): Iterable<GameCurrentTeam> {
-    return this.tableCache.iter();
-  }
-  /**
-   * Access to the `gameId` unique index on the table `game_current_team`,
-   * which allows point queries on the field of the same name
-   * via the [`GameCurrentTeamGameIdUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.gameCurrentTeam.gameId().find(...)`.
-   *
-   * Get a handle on the `gameId` unique index on the table `game_current_team`.
-   */
-  gameId = {
-    // Find the subscribed row whose `gameId` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: number): GameCurrentTeam | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (deepEqual(row.gameId, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
-  /**
-   * Access to the `teamId` unique index on the table `game_current_team`,
-   * which allows point queries on the field of the same name
-   * via the [`GameCurrentTeamTeamIdUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.gameCurrentTeam.teamId().find(...)`.
-   *
-   * Get a handle on the `teamId` unique index on the table `game_current_team`.
-   */
-  teamId = {
-    // Find the subscribed row whose `teamId` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: number): GameCurrentTeam | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (deepEqual(row.teamId, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
+	iter(): Iterable<GameCurrentTeam> {
+		return this.tableCache.iter();
+	}
+	/**
+	 * Access to the `gameId` unique index on the table `game_current_team`,
+	 * which allows point queries on the field of the same name
+	 * via the [`GameCurrentTeamGameIdUnique.find`] method.
+	 *
+	 * Users are encouraged not to explicitly reference this type,
+	 * but to directly chain method calls,
+	 * like `ctx.db.gameCurrentTeam.gameId().find(...)`.
+	 *
+	 * Get a handle on the `gameId` unique index on the table `game_current_team`.
+	 */
+	gameId = {
+		// Find the subscribed row whose `gameId` column value is equal to `col_val`,
+		// if such a row is present in the client cache.
+		find: (col_val: number): GameCurrentTeam | undefined => {
+			for (let row of this.tableCache.iter()) {
+				if (deepEqual(row.gameId, col_val)) {
+					return row;
+				}
+			}
+		}
+	};
+	/**
+	 * Access to the `teamId` unique index on the table `game_current_team`,
+	 * which allows point queries on the field of the same name
+	 * via the [`GameCurrentTeamTeamIdUnique.find`] method.
+	 *
+	 * Users are encouraged not to explicitly reference this type,
+	 * but to directly chain method calls,
+	 * like `ctx.db.gameCurrentTeam.teamId().find(...)`.
+	 *
+	 * Get a handle on the `teamId` unique index on the table `game_current_team`.
+	 */
+	teamId = {
+		// Find the subscribed row whose `teamId` column value is equal to `col_val`,
+		// if such a row is present in the client cache.
+		find: (col_val: number): GameCurrentTeam | undefined => {
+			for (let row of this.tableCache.iter()) {
+				if (deepEqual(row.teamId, col_val)) {
+					return row;
+				}
+			}
+		}
+	};
 
-  onInsert = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
-    return this.tableCache.onInsert(cb);
-  }
+	onInsert = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
+		return this.tableCache.onInsert(cb);
+	};
 
-  removeOnInsert = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
-    return this.tableCache.removeOnInsert(cb);
-  }
+	removeOnInsert = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
+		return this.tableCache.removeOnInsert(cb);
+	};
 
-  onDelete = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
-    return this.tableCache.onDelete(cb);
-  }
+	onDelete = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
+		return this.tableCache.onDelete(cb);
+	};
 
-  removeOnDelete = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
-    return this.tableCache.removeOnDelete(cb);
-  }
+	removeOnDelete = (cb: (ctx: EventContext, row: GameCurrentTeam) => void) => {
+		return this.tableCache.removeOnDelete(cb);
+	};
 
-  // Updates are only defined for tables with primary keys.
-  onUpdate = (cb: (ctx: EventContext, oldRow: GameCurrentTeam, newRow: GameCurrentTeam) => void) => {
-    return this.tableCache.onUpdate(cb);
-  }
+	// Updates are only defined for tables with primary keys.
+	onUpdate = (
+		cb: (ctx: EventContext, oldRow: GameCurrentTeam, newRow: GameCurrentTeam) => void
+	) => {
+		return this.tableCache.onUpdate(cb);
+	};
 
-  removeOnUpdate = (cb: (ctx: EventContext, onRow: GameCurrentTeam, newRow: GameCurrentTeam) => void) => {
-    return this.tableCache.removeOnUpdate(cb);
-  }}
+	removeOnUpdate = (
+		cb: (ctx: EventContext, onRow: GameCurrentTeam, newRow: GameCurrentTeam) => void
+	) => {
+		return this.tableCache.removeOnUpdate(cb);
+	};
+}

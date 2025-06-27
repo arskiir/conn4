@@ -7,67 +7,77 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
-import { Winner as __Winner } from "./winner_type";
-import { Coord as __Coord } from "./coord_type";
-import { DroppedPiece as __DroppedPiece } from "./dropped_piece_type";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
+import { Winner as __Winner } from './winner_type';
+import { Coord as __Coord } from './coord_type';
+import { DroppedPiece as __DroppedPiece } from './dropped_piece_type';
 
 export type Game = {
-  roomId: number,
-  winner: __Winner | undefined,
-  table: (__DroppedPiece | undefined)[][],
-  latestMove: __Coord | undefined,
+	roomId: number;
+	winner: __Winner | undefined;
+	table: (__DroppedPiece | undefined)[][];
+	latestMove: __Coord | undefined;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace Game {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("roomId", AlgebraicType.createU32Type()),
-      new ProductTypeElement("winner", AlgebraicType.createOptionType(__Winner.getTypeScriptAlgebraicType())),
-      new ProductTypeElement("table", AlgebraicType.createArrayType(AlgebraicType.createArrayType(AlgebraicType.createOptionType(__DroppedPiece.getTypeScriptAlgebraicType())))),
-      new ProductTypeElement("latestMove", AlgebraicType.createOptionType(__Coord.getTypeScriptAlgebraicType())),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('roomId', AlgebraicType.createU32Type()),
+			new ProductTypeElement(
+				'winner',
+				AlgebraicType.createOptionType(__Winner.getTypeScriptAlgebraicType())
+			),
+			new ProductTypeElement(
+				'table',
+				AlgebraicType.createArrayType(
+					AlgebraicType.createArrayType(
+						AlgebraicType.createOptionType(__DroppedPiece.getTypeScriptAlgebraicType())
+					)
+				)
+			),
+			new ProductTypeElement(
+				'latestMove',
+				AlgebraicType.createOptionType(__Coord.getTypeScriptAlgebraicType())
+			)
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: Game): void {
-    Game.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: Game): void {
+		Game.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): Game {
-    return Game.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): Game {
+		return Game.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-
-

@@ -1,72 +1,76 @@
-import { DbConnection, type EventContext } from '../../module_bindings/index'
-import { Room } from "../../module_bindings";
+import { DbConnection, type EventContext } from '../../module_bindings/index';
+import { Room } from '../../module_bindings';
 import { SubscriptionHandle } from '$lib';
 
 export class UseRoom {
-    private _title = $state<string | null>();
-    get title() {
-        return this._title;
-    }
+	private _title = $state<string | null>();
+	get title() {
+		return this._title;
+	}
 
-    private _room = $state<Room | null>(null);
+	private _room = $state<Room | null>(null);
 
-    private readonly roomSubHandle: SubscriptionHandle;
+	private readonly roomSubHandle: SubscriptionHandle;
 
-    private readonly roomOnUpdate: (ctx: EventContext, oldRow: Room, newRow: Room) => void
+	private readonly roomOnUpdate: (ctx: EventContext, oldRow: Room, newRow: Room) => void;
 
-    constructor(private readonly conn: DbConnection, roomId: number, public readonly initialTitle: string | null) {
-        this._title = initialTitle
-        $effect(() => {
-            if (this._room?.title) {
-                this._title = this._room.title;
-            }
-        });
+	constructor(
+		private readonly conn: DbConnection,
+		roomId: number,
+		public readonly initialTitle: string | null
+	) {
+		this._title = initialTitle;
+		$effect(() => {
+			if (this._room?.title) {
+				this._title = this._room.title;
+			}
+		});
 
-        this.roomOnUpdate = (ctx, _, n) => {
-            if (this._room && this._room.id === n.id) {
-                this._room = n;
-            } else {
-                throw new Error('Room update?? What is this?');
-            }
-        }
+		this.roomOnUpdate = (ctx, _, n) => {
+			if (this._room && this._room.id === n.id) {
+				this._room = n;
+			} else {
+				throw new Error('Room update?? What is this?');
+			}
+		};
 
-        conn.db.room.onUpdate(this.roomOnUpdate);
-        this.roomSubHandle = conn
-            .subscriptionBuilder()
-            .onApplied(() => {
-                for (const room of conn.db.room.iter()) {
-                    if (room.id === roomId) {
-                        this._room = room;
-                    } else {
-                        console.error('Room already set?? Impossible!');
-                    }
-                }
-            })
-            .onError((ctx) => {
-                console.error('Error fetching join rooms:', ctx.event);
-            })
-            .subscribe(`SELECT * FROM room WHERE id = '${roomId}'`);
-    }
+		conn.db.room.onUpdate(this.roomOnUpdate);
+		this.roomSubHandle = conn
+			.subscriptionBuilder()
+			.onApplied(() => {
+				for (const room of conn.db.room.iter()) {
+					if (room.id === roomId) {
+						this._room = room;
+					} else {
+						console.error('Room already set?? Impossible!');
+					}
+				}
+			})
+			.onError((ctx) => {
+				console.error('Error fetching join rooms:', ctx.event);
+			})
+			.subscribe(`SELECT * FROM room WHERE id = '${roomId}'`);
+	}
 
-    async stop() {
-        const removeListeners = () => {
-            this.conn.db.room.removeOnUpdate(this.roomOnUpdate);
-        }
+	async stop() {
+		const removeListeners = () => {
+			this.conn.db.room.removeOnUpdate(this.roomOnUpdate);
+		};
 
-        return new Promise<void>(resolve => {
-            if (this.roomSubHandle.isActive()) {
-                this.roomSubHandle.unsubscribeThen(() => {
-                    removeListeners()
-                    resolve();
-                });
-            } else {
-                removeListeners()
-                resolve();
-            }
-        })
-    }
+		return new Promise<void>((resolve) => {
+			if (this.roomSubHandle.isActive()) {
+				this.roomSubHandle.unsubscribeThen(() => {
+					removeListeners();
+					resolve();
+				});
+			} else {
+				removeListeners();
+				resolve();
+			}
+		});
+	}
 
-    get room() {
-        return this._room;
-    }
+	get room() {
+		return this._room;
+	}
 }

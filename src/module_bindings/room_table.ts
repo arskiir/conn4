@@ -7,33 +7,33 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
-import { Room } from "./room_type";
-import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
+import { Room } from './room_type';
+import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from '.';
 
 /**
  * Table handle for the table `room`.
@@ -46,85 +46,86 @@ import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".
  * like `ctx.db.room.on_insert(...)`.
  */
 export class RoomTableHandle {
-  tableCache: TableCache<Room>;
+	tableCache: TableCache<Room>;
 
-  constructor(tableCache: TableCache<Room>) {
-    this.tableCache = tableCache;
-  }
+	constructor(tableCache: TableCache<Room>) {
+		this.tableCache = tableCache;
+	}
 
-  count(): number {
-    return this.tableCache.count();
-  }
+	count(): number {
+		return this.tableCache.count();
+	}
 
-  iter(): Iterable<Room> {
-    return this.tableCache.iter();
-  }
-  /**
-   * Access to the `id` unique index on the table `room`,
-   * which allows point queries on the field of the same name
-   * via the [`RoomIdUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.room.id().find(...)`.
-   *
-   * Get a handle on the `id` unique index on the table `room`.
-   */
-  id = {
-    // Find the subscribed row whose `id` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: number): Room | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (deepEqual(row.id, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
-  /**
-   * Access to the `owner` unique index on the table `room`,
-   * which allows point queries on the field of the same name
-   * via the [`RoomOwnerUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.room.owner().find(...)`.
-   *
-   * Get a handle on the `owner` unique index on the table `room`.
-   */
-  owner = {
-    // Find the subscribed row whose `owner` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: Identity): Room | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (deepEqual(row.owner, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
+	iter(): Iterable<Room> {
+		return this.tableCache.iter();
+	}
+	/**
+	 * Access to the `id` unique index on the table `room`,
+	 * which allows point queries on the field of the same name
+	 * via the [`RoomIdUnique.find`] method.
+	 *
+	 * Users are encouraged not to explicitly reference this type,
+	 * but to directly chain method calls,
+	 * like `ctx.db.room.id().find(...)`.
+	 *
+	 * Get a handle on the `id` unique index on the table `room`.
+	 */
+	id = {
+		// Find the subscribed row whose `id` column value is equal to `col_val`,
+		// if such a row is present in the client cache.
+		find: (col_val: number): Room | undefined => {
+			for (let row of this.tableCache.iter()) {
+				if (deepEqual(row.id, col_val)) {
+					return row;
+				}
+			}
+		}
+	};
+	/**
+	 * Access to the `owner` unique index on the table `room`,
+	 * which allows point queries on the field of the same name
+	 * via the [`RoomOwnerUnique.find`] method.
+	 *
+	 * Users are encouraged not to explicitly reference this type,
+	 * but to directly chain method calls,
+	 * like `ctx.db.room.owner().find(...)`.
+	 *
+	 * Get a handle on the `owner` unique index on the table `room`.
+	 */
+	owner = {
+		// Find the subscribed row whose `owner` column value is equal to `col_val`,
+		// if such a row is present in the client cache.
+		find: (col_val: Identity): Room | undefined => {
+			for (let row of this.tableCache.iter()) {
+				if (deepEqual(row.owner, col_val)) {
+					return row;
+				}
+			}
+		}
+	};
 
-  onInsert = (cb: (ctx: EventContext, row: Room) => void) => {
-    return this.tableCache.onInsert(cb);
-  }
+	onInsert = (cb: (ctx: EventContext, row: Room) => void) => {
+		return this.tableCache.onInsert(cb);
+	};
 
-  removeOnInsert = (cb: (ctx: EventContext, row: Room) => void) => {
-    return this.tableCache.removeOnInsert(cb);
-  }
+	removeOnInsert = (cb: (ctx: EventContext, row: Room) => void) => {
+		return this.tableCache.removeOnInsert(cb);
+	};
 
-  onDelete = (cb: (ctx: EventContext, row: Room) => void) => {
-    return this.tableCache.onDelete(cb);
-  }
+	onDelete = (cb: (ctx: EventContext, row: Room) => void) => {
+		return this.tableCache.onDelete(cb);
+	};
 
-  removeOnDelete = (cb: (ctx: EventContext, row: Room) => void) => {
-    return this.tableCache.removeOnDelete(cb);
-  }
+	removeOnDelete = (cb: (ctx: EventContext, row: Room) => void) => {
+		return this.tableCache.removeOnDelete(cb);
+	};
 
-  // Updates are only defined for tables with primary keys.
-  onUpdate = (cb: (ctx: EventContext, oldRow: Room, newRow: Room) => void) => {
-    return this.tableCache.onUpdate(cb);
-  }
+	// Updates are only defined for tables with primary keys.
+	onUpdate = (cb: (ctx: EventContext, oldRow: Room, newRow: Room) => void) => {
+		return this.tableCache.onUpdate(cb);
+	};
 
-  removeOnUpdate = (cb: (ctx: EventContext, onRow: Room, newRow: Room) => void) => {
-    return this.tableCache.removeOnUpdate(cb);
-  }}
+	removeOnUpdate = (cb: (ctx: EventContext, onRow: Room, newRow: Room) => void) => {
+		return this.tableCache.removeOnUpdate(cb);
+	};
+}

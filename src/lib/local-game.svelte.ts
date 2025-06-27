@@ -4,7 +4,7 @@ const createTable = () => {
 	return Array.from({ length: rows }, () =>
 		Array.from({ length: cols }, () => {
 			return undefined;
-		}),
+		})
 	);
 };
 
@@ -43,10 +43,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 		sw = !sw;
 	};
 
-	function checkWin(
-		table: LocalGameState['table'],
-		playerId: string,
-	): null | [number, number][] {
+	function checkWin(table: LocalGameState['table'], playerId: string): null | [number, number][] {
 		const rows = table.length;
 		const cols = table[0].length;
 		const winningStreak = 4;
@@ -64,7 +61,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 						[row, col],
 						[row, col + 1],
 						[row, col + 2],
-						[row, col + 3],
+						[row, col + 3]
 					];
 				}
 			}
@@ -83,7 +80,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 						[row, col],
 						[row + 1, col],
 						[row + 2, col],
-						[row + 3, col],
+						[row + 3, col]
 					];
 				}
 			}
@@ -102,7 +99,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 						[row, col],
 						[row + 1, col + 1],
 						[row + 2, col + 2],
-						[row + 3, col + 3],
+						[row + 3, col + 3]
 					];
 				}
 			}
@@ -121,7 +118,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 						[row, col],
 						[row - 1, col + 1],
 						[row - 2, col + 2],
-						[row - 3, col + 3],
+						[row - 3, col + 3]
 					];
 				}
 			}
@@ -168,7 +165,7 @@ export function createLocalGame(args: { players: [LocalPlayer, LocalPlayer] }) {
 		players,
 		switchTurn,
 		dropPiece,
-		restart,
+		restart
 	};
 }
 

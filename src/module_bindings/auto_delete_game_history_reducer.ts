@@ -7,59 +7,57 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 
-import { AutoDeleteGameHistoryTimer as __AutoDeleteGameHistoryTimer } from "./auto_delete_game_history_timer_type";
+import { AutoDeleteGameHistoryTimer as __AutoDeleteGameHistoryTimer } from './auto_delete_game_history_timer_type';
 
 export type AutoDeleteGameHistory = {
-  timer: __AutoDeleteGameHistoryTimer,
+	timer: __AutoDeleteGameHistoryTimer;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace AutoDeleteGameHistory {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("timer", __AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType()),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('timer', __AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType())
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: AutoDeleteGameHistory): void {
-    AutoDeleteGameHistory.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: AutoDeleteGameHistory): void {
+		AutoDeleteGameHistory.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): AutoDeleteGameHistory {
-    return AutoDeleteGameHistory.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): AutoDeleteGameHistory {
+		return AutoDeleteGameHistory.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-

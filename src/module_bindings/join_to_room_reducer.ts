@@ -7,59 +7,60 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 
 export type JoinToRoom = {
-  roomId: number,
-  password: string | undefined,
+	roomId: number;
+	password: string | undefined;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace JoinToRoom {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("roomId", AlgebraicType.createU32Type()),
-      new ProductTypeElement("password", AlgebraicType.createOptionType(AlgebraicType.createStringType())),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('roomId', AlgebraicType.createU32Type()),
+			new ProductTypeElement(
+				'password',
+				AlgebraicType.createOptionType(AlgebraicType.createStringType())
+			)
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: JoinToRoom): void {
-    JoinToRoom.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: JoinToRoom): void {
+		JoinToRoom.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): JoinToRoom {
-    return JoinToRoom.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): JoinToRoom {
+		return JoinToRoom.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-

@@ -7,37 +7,37 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
-import { Game } from "./game_type";
-import { Winner as __Winner } from "./winner_type";
-import { Coord as __Coord } from "./coord_type";
-import { DroppedPiece as __DroppedPiece } from "./dropped_piece_type";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
+import { Game } from './game_type';
+import { Winner as __Winner } from './winner_type';
+import { Coord as __Coord } from './coord_type';
+import { DroppedPiece as __DroppedPiece } from './dropped_piece_type';
 
-import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
+import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from '.';
 
 /**
  * Table handle for the table `game`.
@@ -50,63 +50,64 @@ import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".
  * like `ctx.db.game.on_insert(...)`.
  */
 export class GameTableHandle {
-  tableCache: TableCache<Game>;
+	tableCache: TableCache<Game>;
 
-  constructor(tableCache: TableCache<Game>) {
-    this.tableCache = tableCache;
-  }
+	constructor(tableCache: TableCache<Game>) {
+		this.tableCache = tableCache;
+	}
 
-  count(): number {
-    return this.tableCache.count();
-  }
+	count(): number {
+		return this.tableCache.count();
+	}
 
-  iter(): Iterable<Game> {
-    return this.tableCache.iter();
-  }
-  /**
-   * Access to the `roomId` unique index on the table `game`,
-   * which allows point queries on the field of the same name
-   * via the [`GameRoomIdUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.game.roomId().find(...)`.
-   *
-   * Get a handle on the `roomId` unique index on the table `game`.
-   */
-  roomId = {
-    // Find the subscribed row whose `roomId` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: number): Game | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (deepEqual(row.roomId, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
+	iter(): Iterable<Game> {
+		return this.tableCache.iter();
+	}
+	/**
+	 * Access to the `roomId` unique index on the table `game`,
+	 * which allows point queries on the field of the same name
+	 * via the [`GameRoomIdUnique.find`] method.
+	 *
+	 * Users are encouraged not to explicitly reference this type,
+	 * but to directly chain method calls,
+	 * like `ctx.db.game.roomId().find(...)`.
+	 *
+	 * Get a handle on the `roomId` unique index on the table `game`.
+	 */
+	roomId = {
+		// Find the subscribed row whose `roomId` column value is equal to `col_val`,
+		// if such a row is present in the client cache.
+		find: (col_val: number): Game | undefined => {
+			for (let row of this.tableCache.iter()) {
+				if (deepEqual(row.roomId, col_val)) {
+					return row;
+				}
+			}
+		}
+	};
 
-  onInsert = (cb: (ctx: EventContext, row: Game) => void) => {
-    return this.tableCache.onInsert(cb);
-  }
+	onInsert = (cb: (ctx: EventContext, row: Game) => void) => {
+		return this.tableCache.onInsert(cb);
+	};
 
-  removeOnInsert = (cb: (ctx: EventContext, row: Game) => void) => {
-    return this.tableCache.removeOnInsert(cb);
-  }
+	removeOnInsert = (cb: (ctx: EventContext, row: Game) => void) => {
+		return this.tableCache.removeOnInsert(cb);
+	};
 
-  onDelete = (cb: (ctx: EventContext, row: Game) => void) => {
-    return this.tableCache.onDelete(cb);
-  }
+	onDelete = (cb: (ctx: EventContext, row: Game) => void) => {
+		return this.tableCache.onDelete(cb);
+	};
 
-  removeOnDelete = (cb: (ctx: EventContext, row: Game) => void) => {
-    return this.tableCache.removeOnDelete(cb);
-  }
+	removeOnDelete = (cb: (ctx: EventContext, row: Game) => void) => {
+		return this.tableCache.removeOnDelete(cb);
+	};
 
-  // Updates are only defined for tables with primary keys.
-  onUpdate = (cb: (ctx: EventContext, oldRow: Game, newRow: Game) => void) => {
-    return this.tableCache.onUpdate(cb);
-  }
+	// Updates are only defined for tables with primary keys.
+	onUpdate = (cb: (ctx: EventContext, oldRow: Game, newRow: Game) => void) => {
+		return this.tableCache.onUpdate(cb);
+	};
 
-  removeOnUpdate = (cb: (ctx: EventContext, onRow: Game, newRow: Game) => void) => {
-    return this.tableCache.removeOnUpdate(cb);
-  }}
+	removeOnUpdate = (cb: (ctx: EventContext, onRow: Game, newRow: Game) => void) => {
+		return this.tableCache.removeOnUpdate(cb);
+	};
+}

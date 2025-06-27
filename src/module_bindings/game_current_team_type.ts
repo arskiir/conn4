@@ -7,59 +7,56 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 export type GameCurrentTeam = {
-  gameId: number,
-  teamId: number,
+	gameId: number;
+	teamId: number;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace GameCurrentTeam {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("gameId", AlgebraicType.createU32Type()),
-      new ProductTypeElement("teamId", AlgebraicType.createU32Type()),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('gameId', AlgebraicType.createU32Type()),
+			new ProductTypeElement('teamId', AlgebraicType.createU32Type())
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: GameCurrentTeam): void {
-    GameCurrentTeam.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: GameCurrentTeam): void {
+		GameCurrentTeam.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): GameCurrentTeam {
-    return GameCurrentTeam.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): GameCurrentTeam {
+		return GameCurrentTeam.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-
-

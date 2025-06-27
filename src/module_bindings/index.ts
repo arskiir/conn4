@@ -7,739 +7,869 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 
 // Import and reexport all reducer arg types
-import { AutoDeleteGameHistory } from "./auto_delete_game_history_reducer.ts";
+import { AutoDeleteGameHistory } from './auto_delete_game_history_reducer.ts';
 export { AutoDeleteGameHistory };
-import { AutoDeleteRoomIfAllOffline } from "./auto_delete_room_if_all_offline_reducer.ts";
+import { AutoDeleteRoomIfAllOffline } from './auto_delete_room_if_all_offline_reducer.ts';
 export { AutoDeleteRoomIfAllOffline };
-import { CreateGame } from "./create_game_reducer.ts";
+import { CreateGame } from './create_game_reducer.ts';
 export { CreateGame };
-import { CreateRoom } from "./create_room_reducer.ts";
+import { CreateRoom } from './create_room_reducer.ts';
 export { CreateRoom };
-import { DropPiece } from "./drop_piece_reducer.ts";
+import { DropPiece } from './drop_piece_reducer.ts';
 export { DropPiece };
-import { Hello } from "./hello_reducer.ts";
+import { Hello } from './hello_reducer.ts';
 export { Hello };
-import { HelloWithText } from "./hello_with_text_reducer.ts";
+import { HelloWithText } from './hello_with_text_reducer.ts';
 export { HelloWithText };
-import { IdentityConnected } from "./identity_connected_reducer.ts";
+import { IdentityConnected } from './identity_connected_reducer.ts';
 export { IdentityConnected };
-import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
+import { IdentityDisconnected } from './identity_disconnected_reducer.ts';
 export { IdentityDisconnected };
-import { JoinToRoom } from "./join_to_room_reducer.ts";
+import { JoinToRoom } from './join_to_room_reducer.ts';
 export { JoinToRoom };
-import { JoinToTeam } from "./join_to_team_reducer.ts";
+import { JoinToTeam } from './join_to_team_reducer.ts';
 export { JoinToTeam };
-import { LeaveRoom } from "./leave_room_reducer.ts";
+import { LeaveRoom } from './leave_room_reducer.ts';
 export { LeaveRoom };
-import { RestartGameHasWinner } from "./restart_game_has_winner_reducer.ts";
+import { RestartGameHasWinner } from './restart_game_has_winner_reducer.ts';
 export { RestartGameHasWinner };
-import { RestartGameTableFull } from "./restart_game_table_full_reducer.ts";
+import { RestartGameTableFull } from './restart_game_table_full_reducer.ts';
 export { RestartGameTableFull };
-import { SendMessage } from "./send_message_reducer.ts";
+import { SendMessage } from './send_message_reducer.ts';
 export { SendMessage };
-import { SetName } from "./set_name_reducer.ts";
+import { SetName } from './set_name_reducer.ts';
 export { SetName };
 
 // Import and reexport all table handle types
-import { AutoDeleteGameHistoryTimerTableHandle } from "./auto_delete_game_history_timer_table.ts";
+import { AutoDeleteGameHistoryTimerTableHandle } from './auto_delete_game_history_timer_table.ts';
 export { AutoDeleteGameHistoryTimerTableHandle };
-import { AutoDeleteRoomTimerTableHandle } from "./auto_delete_room_timer_table.ts";
+import { AutoDeleteRoomTimerTableHandle } from './auto_delete_room_timer_table.ts';
 export { AutoDeleteRoomTimerTableHandle };
-import { GameTableHandle } from "./game_table.ts";
+import { GameTableHandle } from './game_table.ts';
 export { GameTableHandle };
-import { GameCurrentTeamTableHandle } from "./game_current_team_table.ts";
+import { GameCurrentTeamTableHandle } from './game_current_team_table.ts';
 export { GameCurrentTeamTableHandle };
-import { GameHistoryTableHandle } from "./game_history_table.ts";
+import { GameHistoryTableHandle } from './game_history_table.ts';
 export { GameHistoryTableHandle };
-import { HasDroppedPieceToGameTableHandle } from "./has_dropped_piece_to_game_table.ts";
+import { HasDroppedPieceToGameTableHandle } from './has_dropped_piece_to_game_table.ts';
 export { HasDroppedPieceToGameTableHandle };
-import { JoinRoomTableHandle } from "./join_room_table.ts";
+import { JoinRoomTableHandle } from './join_room_table.ts';
 export { JoinRoomTableHandle };
-import { JoinTeamTableHandle } from "./join_team_table.ts";
+import { JoinTeamTableHandle } from './join_team_table.ts';
 export { JoinTeamTableHandle };
-import { MessageTableHandle } from "./message_table.ts";
+import { MessageTableHandle } from './message_table.ts';
 export { MessageTableHandle };
-import { PlayerTableHandle } from "./player_table.ts";
+import { PlayerTableHandle } from './player_table.ts';
 export { PlayerTableHandle };
-import { RoomTableHandle } from "./room_table.ts";
+import { RoomTableHandle } from './room_table.ts';
 export { RoomTableHandle };
-import { RoomPasswordTableHandle } from "./room_password_table.ts";
+import { RoomPasswordTableHandle } from './room_password_table.ts';
 export { RoomPasswordTableHandle };
-import { StatsOneMonthTableHandle } from "./stats_one_month_table.ts";
+import { StatsOneMonthTableHandle } from './stats_one_month_table.ts';
 export { StatsOneMonthTableHandle };
-import { TeamTableHandle } from "./team_table.ts";
+import { TeamTableHandle } from './team_table.ts';
 export { TeamTableHandle };
 
 // Import and reexport all types
-import { AutoDeleteGameHistoryTimer } from "./auto_delete_game_history_timer_type.ts";
+import { AutoDeleteGameHistoryTimer } from './auto_delete_game_history_timer_type.ts';
 export { AutoDeleteGameHistoryTimer };
-import { AutoDeleteRoomTimer } from "./auto_delete_room_timer_type.ts";
+import { AutoDeleteRoomTimer } from './auto_delete_room_timer_type.ts';
 export { AutoDeleteRoomTimer };
-import { Coord } from "./coord_type.ts";
+import { Coord } from './coord_type.ts';
 export { Coord };
-import { DroppedPiece } from "./dropped_piece_type.ts";
+import { DroppedPiece } from './dropped_piece_type.ts';
 export { DroppedPiece };
-import { Game } from "./game_type.ts";
+import { Game } from './game_type.ts';
 export { Game };
-import { GameCurrentTeam } from "./game_current_team_type.ts";
+import { GameCurrentTeam } from './game_current_team_type.ts';
 export { GameCurrentTeam };
-import { GameHistory } from "./game_history_type.ts";
+import { GameHistory } from './game_history_type.ts';
 export { GameHistory };
-import { HasDroppedPieceToGame } from "./has_dropped_piece_to_game_type.ts";
+import { HasDroppedPieceToGame } from './has_dropped_piece_to_game_type.ts';
 export { HasDroppedPieceToGame };
-import { JoinRoom } from "./join_room_type.ts";
+import { JoinRoom } from './join_room_type.ts';
 export { JoinRoom };
-import { JoinTeam } from "./join_team_type.ts";
+import { JoinTeam } from './join_team_type.ts';
 export { JoinTeam };
-import { Message } from "./message_type.ts";
+import { Message } from './message_type.ts';
 export { Message };
-import { Player } from "./player_type.ts";
+import { Player } from './player_type.ts';
 export { Player };
-import { Room } from "./room_type.ts";
+import { Room } from './room_type.ts';
 export { Room };
-import { RoomPassword } from "./room_password_type.ts";
+import { RoomPassword } from './room_password_type.ts';
 export { RoomPassword };
-import { StatsOneMonth } from "./stats_one_month_type.ts";
+import { StatsOneMonth } from './stats_one_month_type.ts';
 export { StatsOneMonth };
-import { Team } from "./team_type.ts";
+import { Team } from './team_type.ts';
 export { Team };
-import { Winner } from "./winner_type.ts";
+import { Winner } from './winner_type.ts';
 export { Winner };
 
 const REMOTE_MODULE = {
-  tables: {
-    auto_delete_game_history_timer: {
-      tableName: "auto_delete_game_history_timer",
-      rowType: AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType(),
-      primaryKey: "scheduledId",
-      primaryKeyInfo: {
-        colName: "scheduledId",
-        colType: AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    auto_delete_room_timer: {
-      tableName: "auto_delete_room_timer",
-      rowType: AutoDeleteRoomTimer.getTypeScriptAlgebraicType(),
-      primaryKey: "scheduledId",
-      primaryKeyInfo: {
-        colName: "scheduledId",
-        colType: AutoDeleteRoomTimer.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    game: {
-      tableName: "game",
-      rowType: Game.getTypeScriptAlgebraicType(),
-      primaryKey: "roomId",
-      primaryKeyInfo: {
-        colName: "roomId",
-        colType: Game.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    game_current_team: {
-      tableName: "game_current_team",
-      rowType: GameCurrentTeam.getTypeScriptAlgebraicType(),
-      primaryKey: "gameId",
-      primaryKeyInfo: {
-        colName: "gameId",
-        colType: GameCurrentTeam.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    game_history: {
-      tableName: "game_history",
-      rowType: GameHistory.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
-      primaryKeyInfo: {
-        colName: "id",
-        colType: GameHistory.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    has_dropped_piece_to_game: {
-      tableName: "has_dropped_piece_to_game",
-      rowType: HasDroppedPieceToGame.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
-      primaryKeyInfo: {
-        colName: "id",
-        colType: HasDroppedPieceToGame.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    join_room: {
-      tableName: "join_room",
-      rowType: JoinRoom.getTypeScriptAlgebraicType(),
-      primaryKey: "joiner",
-      primaryKeyInfo: {
-        colName: "joiner",
-        colType: JoinRoom.getTypeScriptAlgebraicType().product.elements[1].algebraicType,
-      },
-    },
-    join_team: {
-      tableName: "join_team",
-      rowType: JoinTeam.getTypeScriptAlgebraicType(),
-      primaryKey: "joiner",
-      primaryKeyInfo: {
-        colName: "joiner",
-        colType: JoinTeam.getTypeScriptAlgebraicType().product.elements[1].algebraicType,
-      },
-    },
-    message: {
-      tableName: "message",
-      rowType: Message.getTypeScriptAlgebraicType(),
-    },
-    player: {
-      tableName: "player",
-      rowType: Player.getTypeScriptAlgebraicType(),
-      primaryKey: "identity",
-      primaryKeyInfo: {
-        colName: "identity",
-        colType: Player.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    room: {
-      tableName: "room",
-      rowType: Room.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
-      primaryKeyInfo: {
-        colName: "id",
-        colType: Room.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    room_password: {
-      tableName: "room_password",
-      rowType: RoomPassword.getTypeScriptAlgebraicType(),
-      primaryKey: "roomId",
-      primaryKeyInfo: {
-        colName: "roomId",
-        colType: RoomPassword.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    stats_one_month: {
-      tableName: "stats_one_month",
-      rowType: StatsOneMonth.getTypeScriptAlgebraicType(),
-      primaryKey: "player",
-      primaryKeyInfo: {
-        colName: "player",
-        colType: StatsOneMonth.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-    team: {
-      tableName: "team",
-      rowType: Team.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
-      primaryKeyInfo: {
-        colName: "id",
-        colType: Team.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
-      },
-    },
-  },
-  reducers: {
-    auto_delete_game_history: {
-      reducerName: "auto_delete_game_history",
-      argsType: AutoDeleteGameHistory.getTypeScriptAlgebraicType(),
-    },
-    auto_delete_room_if_all_offline: {
-      reducerName: "auto_delete_room_if_all_offline",
-      argsType: AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType(),
-    },
-    create_game: {
-      reducerName: "create_game",
-      argsType: CreateGame.getTypeScriptAlgebraicType(),
-    },
-    create_room: {
-      reducerName: "create_room",
-      argsType: CreateRoom.getTypeScriptAlgebraicType(),
-    },
-    drop_piece: {
-      reducerName: "drop_piece",
-      argsType: DropPiece.getTypeScriptAlgebraicType(),
-    },
-    hello: {
-      reducerName: "hello",
-      argsType: Hello.getTypeScriptAlgebraicType(),
-    },
-    hello_with_text: {
-      reducerName: "hello_with_text",
-      argsType: HelloWithText.getTypeScriptAlgebraicType(),
-    },
-    identity_connected: {
-      reducerName: "identity_connected",
-      argsType: IdentityConnected.getTypeScriptAlgebraicType(),
-    },
-    identity_disconnected: {
-      reducerName: "identity_disconnected",
-      argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
-    },
-    join_to_room: {
-      reducerName: "join_to_room",
-      argsType: JoinToRoom.getTypeScriptAlgebraicType(),
-    },
-    join_to_team: {
-      reducerName: "join_to_team",
-      argsType: JoinToTeam.getTypeScriptAlgebraicType(),
-    },
-    leave_room: {
-      reducerName: "leave_room",
-      argsType: LeaveRoom.getTypeScriptAlgebraicType(),
-    },
-    restart_game_has_winner: {
-      reducerName: "restart_game_has_winner",
-      argsType: RestartGameHasWinner.getTypeScriptAlgebraicType(),
-    },
-    restart_game_table_full: {
-      reducerName: "restart_game_table_full",
-      argsType: RestartGameTableFull.getTypeScriptAlgebraicType(),
-    },
-    send_message: {
-      reducerName: "send_message",
-      argsType: SendMessage.getTypeScriptAlgebraicType(),
-    },
-    set_name: {
-      reducerName: "set_name",
-      argsType: SetName.getTypeScriptAlgebraicType(),
-    },
-  },
-  versionInfo: {
-    cliVersion: "1.2.0",
-  },
-  // Constructors which are used by the DbConnectionImpl to
-  // extract type information from the generated RemoteModule.
-  //
-  // NOTE: This is not strictly necessary for `eventContextConstructor` because
-  // all we do is build a TypeScript object which we could have done inside the
-  // SDK, but if in the future we wanted to create a class this would be
-  // necessary because classes have methods, so we'll keep it.
-  eventContextConstructor: (imp: DbConnectionImpl, event: Event<Reducer>) => {
-    return {
-      ...(imp as DbConnection),
-      event
-    }
-  },
-  dbViewConstructor: (imp: DbConnectionImpl) => {
-    return new RemoteTables(imp);
-  },
-  reducersConstructor: (imp: DbConnectionImpl, setReducerFlags: SetReducerFlags) => {
-    return new RemoteReducers(imp, setReducerFlags);
-  },
-  setReducerFlagsConstructor: () => {
-    return new SetReducerFlags();
-  }
-}
+	tables: {
+		auto_delete_game_history_timer: {
+			tableName: 'auto_delete_game_history_timer',
+			rowType: AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType(),
+			primaryKey: 'scheduledId',
+			primaryKeyInfo: {
+				colName: 'scheduledId',
+				colType:
+					AutoDeleteGameHistoryTimer.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		auto_delete_room_timer: {
+			tableName: 'auto_delete_room_timer',
+			rowType: AutoDeleteRoomTimer.getTypeScriptAlgebraicType(),
+			primaryKey: 'scheduledId',
+			primaryKeyInfo: {
+				colName: 'scheduledId',
+				colType: AutoDeleteRoomTimer.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		game: {
+			tableName: 'game',
+			rowType: Game.getTypeScriptAlgebraicType(),
+			primaryKey: 'roomId',
+			primaryKeyInfo: {
+				colName: 'roomId',
+				colType: Game.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		game_current_team: {
+			tableName: 'game_current_team',
+			rowType: GameCurrentTeam.getTypeScriptAlgebraicType(),
+			primaryKey: 'gameId',
+			primaryKeyInfo: {
+				colName: 'gameId',
+				colType: GameCurrentTeam.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		game_history: {
+			tableName: 'game_history',
+			rowType: GameHistory.getTypeScriptAlgebraicType(),
+			primaryKey: 'id',
+			primaryKeyInfo: {
+				colName: 'id',
+				colType: GameHistory.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		has_dropped_piece_to_game: {
+			tableName: 'has_dropped_piece_to_game',
+			rowType: HasDroppedPieceToGame.getTypeScriptAlgebraicType(),
+			primaryKey: 'id',
+			primaryKeyInfo: {
+				colName: 'id',
+				colType:
+					HasDroppedPieceToGame.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		join_room: {
+			tableName: 'join_room',
+			rowType: JoinRoom.getTypeScriptAlgebraicType(),
+			primaryKey: 'joiner',
+			primaryKeyInfo: {
+				colName: 'joiner',
+				colType: JoinRoom.getTypeScriptAlgebraicType().product.elements[1].algebraicType
+			}
+		},
+		join_team: {
+			tableName: 'join_team',
+			rowType: JoinTeam.getTypeScriptAlgebraicType(),
+			primaryKey: 'joiner',
+			primaryKeyInfo: {
+				colName: 'joiner',
+				colType: JoinTeam.getTypeScriptAlgebraicType().product.elements[1].algebraicType
+			}
+		},
+		message: {
+			tableName: 'message',
+			rowType: Message.getTypeScriptAlgebraicType()
+		},
+		player: {
+			tableName: 'player',
+			rowType: Player.getTypeScriptAlgebraicType(),
+			primaryKey: 'identity',
+			primaryKeyInfo: {
+				colName: 'identity',
+				colType: Player.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		room: {
+			tableName: 'room',
+			rowType: Room.getTypeScriptAlgebraicType(),
+			primaryKey: 'id',
+			primaryKeyInfo: {
+				colName: 'id',
+				colType: Room.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		room_password: {
+			tableName: 'room_password',
+			rowType: RoomPassword.getTypeScriptAlgebraicType(),
+			primaryKey: 'roomId',
+			primaryKeyInfo: {
+				colName: 'roomId',
+				colType: RoomPassword.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		stats_one_month: {
+			tableName: 'stats_one_month',
+			rowType: StatsOneMonth.getTypeScriptAlgebraicType(),
+			primaryKey: 'player',
+			primaryKeyInfo: {
+				colName: 'player',
+				colType: StatsOneMonth.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		},
+		team: {
+			tableName: 'team',
+			rowType: Team.getTypeScriptAlgebraicType(),
+			primaryKey: 'id',
+			primaryKeyInfo: {
+				colName: 'id',
+				colType: Team.getTypeScriptAlgebraicType().product.elements[0].algebraicType
+			}
+		}
+	},
+	reducers: {
+		auto_delete_game_history: {
+			reducerName: 'auto_delete_game_history',
+			argsType: AutoDeleteGameHistory.getTypeScriptAlgebraicType()
+		},
+		auto_delete_room_if_all_offline: {
+			reducerName: 'auto_delete_room_if_all_offline',
+			argsType: AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType()
+		},
+		create_game: {
+			reducerName: 'create_game',
+			argsType: CreateGame.getTypeScriptAlgebraicType()
+		},
+		create_room: {
+			reducerName: 'create_room',
+			argsType: CreateRoom.getTypeScriptAlgebraicType()
+		},
+		drop_piece: {
+			reducerName: 'drop_piece',
+			argsType: DropPiece.getTypeScriptAlgebraicType()
+		},
+		hello: {
+			reducerName: 'hello',
+			argsType: Hello.getTypeScriptAlgebraicType()
+		},
+		hello_with_text: {
+			reducerName: 'hello_with_text',
+			argsType: HelloWithText.getTypeScriptAlgebraicType()
+		},
+		identity_connected: {
+			reducerName: 'identity_connected',
+			argsType: IdentityConnected.getTypeScriptAlgebraicType()
+		},
+		identity_disconnected: {
+			reducerName: 'identity_disconnected',
+			argsType: IdentityDisconnected.getTypeScriptAlgebraicType()
+		},
+		join_to_room: {
+			reducerName: 'join_to_room',
+			argsType: JoinToRoom.getTypeScriptAlgebraicType()
+		},
+		join_to_team: {
+			reducerName: 'join_to_team',
+			argsType: JoinToTeam.getTypeScriptAlgebraicType()
+		},
+		leave_room: {
+			reducerName: 'leave_room',
+			argsType: LeaveRoom.getTypeScriptAlgebraicType()
+		},
+		restart_game_has_winner: {
+			reducerName: 'restart_game_has_winner',
+			argsType: RestartGameHasWinner.getTypeScriptAlgebraicType()
+		},
+		restart_game_table_full: {
+			reducerName: 'restart_game_table_full',
+			argsType: RestartGameTableFull.getTypeScriptAlgebraicType()
+		},
+		send_message: {
+			reducerName: 'send_message',
+			argsType: SendMessage.getTypeScriptAlgebraicType()
+		},
+		set_name: {
+			reducerName: 'set_name',
+			argsType: SetName.getTypeScriptAlgebraicType()
+		}
+	},
+	versionInfo: {
+		cliVersion: '1.2.0'
+	},
+	// Constructors which are used by the DbConnectionImpl to
+	// extract type information from the generated RemoteModule.
+	//
+	// NOTE: This is not strictly necessary for `eventContextConstructor` because
+	// all we do is build a TypeScript object which we could have done inside the
+	// SDK, but if in the future we wanted to create a class this would be
+	// necessary because classes have methods, so we'll keep it.
+	eventContextConstructor: (imp: DbConnectionImpl, event: Event<Reducer>) => {
+		return {
+			...(imp as DbConnection),
+			event
+		};
+	},
+	dbViewConstructor: (imp: DbConnectionImpl) => {
+		return new RemoteTables(imp);
+	},
+	reducersConstructor: (imp: DbConnectionImpl, setReducerFlags: SetReducerFlags) => {
+		return new RemoteReducers(imp, setReducerFlags);
+	},
+	setReducerFlagsConstructor: () => {
+		return new SetReducerFlags();
+	}
+};
 
 // A type representing all the possible variants of a reducer.
-export type Reducer = never
-| { name: "AutoDeleteGameHistory", args: AutoDeleteGameHistory }
-| { name: "AutoDeleteRoomIfAllOffline", args: AutoDeleteRoomIfAllOffline }
-| { name: "CreateGame", args: CreateGame }
-| { name: "CreateRoom", args: CreateRoom }
-| { name: "DropPiece", args: DropPiece }
-| { name: "Hello", args: Hello }
-| { name: "HelloWithText", args: HelloWithText }
-| { name: "IdentityConnected", args: IdentityConnected }
-| { name: "IdentityDisconnected", args: IdentityDisconnected }
-| { name: "JoinToRoom", args: JoinToRoom }
-| { name: "JoinToTeam", args: JoinToTeam }
-| { name: "LeaveRoom", args: LeaveRoom }
-| { name: "RestartGameHasWinner", args: RestartGameHasWinner }
-| { name: "RestartGameTableFull", args: RestartGameTableFull }
-| { name: "SendMessage", args: SendMessage }
-| { name: "SetName", args: SetName }
-;
+export type Reducer =
+	| never
+	| { name: 'AutoDeleteGameHistory'; args: AutoDeleteGameHistory }
+	| { name: 'AutoDeleteRoomIfAllOffline'; args: AutoDeleteRoomIfAllOffline }
+	| { name: 'CreateGame'; args: CreateGame }
+	| { name: 'CreateRoom'; args: CreateRoom }
+	| { name: 'DropPiece'; args: DropPiece }
+	| { name: 'Hello'; args: Hello }
+	| { name: 'HelloWithText'; args: HelloWithText }
+	| { name: 'IdentityConnected'; args: IdentityConnected }
+	| { name: 'IdentityDisconnected'; args: IdentityDisconnected }
+	| { name: 'JoinToRoom'; args: JoinToRoom }
+	| { name: 'JoinToTeam'; args: JoinToTeam }
+	| { name: 'LeaveRoom'; args: LeaveRoom }
+	| { name: 'RestartGameHasWinner'; args: RestartGameHasWinner }
+	| { name: 'RestartGameTableFull'; args: RestartGameTableFull }
+	| { name: 'SendMessage'; args: SendMessage }
+	| { name: 'SetName'; args: SetName };
 
 export class RemoteReducers {
-  constructor(private connection: DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
+	constructor(
+		private connection: DbConnectionImpl,
+		private setCallReducerFlags: SetReducerFlags
+	) {}
 
-  autoDeleteGameHistory(timer: AutoDeleteGameHistoryTimer) {
-    const __args = { timer };
-    let __writer = new BinaryWriter(1024);
-    AutoDeleteGameHistory.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("auto_delete_game_history", __argsBuffer, this.setCallReducerFlags.autoDeleteGameHistoryFlags);
-  }
+	autoDeleteGameHistory(timer: AutoDeleteGameHistoryTimer) {
+		const __args = { timer };
+		let __writer = new BinaryWriter(1024);
+		AutoDeleteGameHistory.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'auto_delete_game_history',
+			__argsBuffer,
+			this.setCallReducerFlags.autoDeleteGameHistoryFlags
+		);
+	}
 
-  onAutoDeleteGameHistory(callback: (ctx: ReducerEventContext, timer: AutoDeleteGameHistoryTimer) => void) {
-    this.connection.onReducer("auto_delete_game_history", callback);
-  }
+	onAutoDeleteGameHistory(
+		callback: (ctx: ReducerEventContext, timer: AutoDeleteGameHistoryTimer) => void
+	) {
+		this.connection.onReducer('auto_delete_game_history', callback);
+	}
 
-  removeOnAutoDeleteGameHistory(callback: (ctx: ReducerEventContext, timer: AutoDeleteGameHistoryTimer) => void) {
-    this.connection.offReducer("auto_delete_game_history", callback);
-  }
+	removeOnAutoDeleteGameHistory(
+		callback: (ctx: ReducerEventContext, timer: AutoDeleteGameHistoryTimer) => void
+	) {
+		this.connection.offReducer('auto_delete_game_history', callback);
+	}
 
-  autoDeleteRoomIfAllOffline(timer: AutoDeleteRoomTimer) {
-    const __args = { timer };
-    let __writer = new BinaryWriter(1024);
-    AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("auto_delete_room_if_all_offline", __argsBuffer, this.setCallReducerFlags.autoDeleteRoomIfAllOfflineFlags);
-  }
+	autoDeleteRoomIfAllOffline(timer: AutoDeleteRoomTimer) {
+		const __args = { timer };
+		let __writer = new BinaryWriter(1024);
+		AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'auto_delete_room_if_all_offline',
+			__argsBuffer,
+			this.setCallReducerFlags.autoDeleteRoomIfAllOfflineFlags
+		);
+	}
 
-  onAutoDeleteRoomIfAllOffline(callback: (ctx: ReducerEventContext, timer: AutoDeleteRoomTimer) => void) {
-    this.connection.onReducer("auto_delete_room_if_all_offline", callback);
-  }
+	onAutoDeleteRoomIfAllOffline(
+		callback: (ctx: ReducerEventContext, timer: AutoDeleteRoomTimer) => void
+	) {
+		this.connection.onReducer('auto_delete_room_if_all_offline', callback);
+	}
 
-  removeOnAutoDeleteRoomIfAllOffline(callback: (ctx: ReducerEventContext, timer: AutoDeleteRoomTimer) => void) {
-    this.connection.offReducer("auto_delete_room_if_all_offline", callback);
-  }
+	removeOnAutoDeleteRoomIfAllOffline(
+		callback: (ctx: ReducerEventContext, timer: AutoDeleteRoomTimer) => void
+	) {
+		this.connection.offReducer('auto_delete_room_if_all_offline', callback);
+	}
 
-  createGame() {
-    this.connection.callReducer("create_game", new Uint8Array(0), this.setCallReducerFlags.createGameFlags);
-  }
+	createGame() {
+		this.connection.callReducer(
+			'create_game',
+			new Uint8Array(0),
+			this.setCallReducerFlags.createGameFlags
+		);
+	}
 
-  onCreateGame(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("create_game", callback);
-  }
+	onCreateGame(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('create_game', callback);
+	}
 
-  removeOnCreateGame(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("create_game", callback);
-  }
+	removeOnCreateGame(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('create_game', callback);
+	}
 
-  createRoom(title: string, password: string | undefined) {
-    const __args = { title, password };
-    let __writer = new BinaryWriter(1024);
-    CreateRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("create_room", __argsBuffer, this.setCallReducerFlags.createRoomFlags);
-  }
+	createRoom(title: string, password: string | undefined) {
+		const __args = { title, password };
+		let __writer = new BinaryWriter(1024);
+		CreateRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'create_room',
+			__argsBuffer,
+			this.setCallReducerFlags.createRoomFlags
+		);
+	}
 
-  onCreateRoom(callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void) {
-    this.connection.onReducer("create_room", callback);
-  }
+	onCreateRoom(
+		callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void
+	) {
+		this.connection.onReducer('create_room', callback);
+	}
 
-  removeOnCreateRoom(callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void) {
-    this.connection.offReducer("create_room", callback);
-  }
+	removeOnCreateRoom(
+		callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void
+	) {
+		this.connection.offReducer('create_room', callback);
+	}
 
-  dropPiece(column: number) {
-    const __args = { column };
-    let __writer = new BinaryWriter(1024);
-    DropPiece.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("drop_piece", __argsBuffer, this.setCallReducerFlags.dropPieceFlags);
-  }
+	dropPiece(column: number) {
+		const __args = { column };
+		let __writer = new BinaryWriter(1024);
+		DropPiece.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'drop_piece',
+			__argsBuffer,
+			this.setCallReducerFlags.dropPieceFlags
+		);
+	}
 
-  onDropPiece(callback: (ctx: ReducerEventContext, column: number) => void) {
-    this.connection.onReducer("drop_piece", callback);
-  }
+	onDropPiece(callback: (ctx: ReducerEventContext, column: number) => void) {
+		this.connection.onReducer('drop_piece', callback);
+	}
 
-  removeOnDropPiece(callback: (ctx: ReducerEventContext, column: number) => void) {
-    this.connection.offReducer("drop_piece", callback);
-  }
+	removeOnDropPiece(callback: (ctx: ReducerEventContext, column: number) => void) {
+		this.connection.offReducer('drop_piece', callback);
+	}
 
-  hello() {
-    this.connection.callReducer("hello", new Uint8Array(0), this.setCallReducerFlags.helloFlags);
-  }
+	hello() {
+		this.connection.callReducer('hello', new Uint8Array(0), this.setCallReducerFlags.helloFlags);
+	}
 
-  onHello(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("hello", callback);
-  }
+	onHello(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('hello', callback);
+	}
 
-  removeOnHello(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("hello", callback);
-  }
+	removeOnHello(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('hello', callback);
+	}
 
-  helloWithText(text: string) {
-    const __args = { text };
-    let __writer = new BinaryWriter(1024);
-    HelloWithText.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("hello_with_text", __argsBuffer, this.setCallReducerFlags.helloWithTextFlags);
-  }
+	helloWithText(text: string) {
+		const __args = { text };
+		let __writer = new BinaryWriter(1024);
+		HelloWithText.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'hello_with_text',
+			__argsBuffer,
+			this.setCallReducerFlags.helloWithTextFlags
+		);
+	}
 
-  onHelloWithText(callback: (ctx: ReducerEventContext, text: string) => void) {
-    this.connection.onReducer("hello_with_text", callback);
-  }
+	onHelloWithText(callback: (ctx: ReducerEventContext, text: string) => void) {
+		this.connection.onReducer('hello_with_text', callback);
+	}
 
-  removeOnHelloWithText(callback: (ctx: ReducerEventContext, text: string) => void) {
-    this.connection.offReducer("hello_with_text", callback);
-  }
+	removeOnHelloWithText(callback: (ctx: ReducerEventContext, text: string) => void) {
+		this.connection.offReducer('hello_with_text', callback);
+	}
 
-  onIdentityConnected(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("identity_connected", callback);
-  }
+	onIdentityConnected(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('identity_connected', callback);
+	}
 
-  removeOnIdentityConnected(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("identity_connected", callback);
-  }
+	removeOnIdentityConnected(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('identity_connected', callback);
+	}
 
-  onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("identity_disconnected", callback);
-  }
+	onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('identity_disconnected', callback);
+	}
 
-  removeOnIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("identity_disconnected", callback);
-  }
+	removeOnIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('identity_disconnected', callback);
+	}
 
-  joinToRoom(roomId: number, password: string | undefined) {
-    const __args = { roomId, password };
-    let __writer = new BinaryWriter(1024);
-    JoinToRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("join_to_room", __argsBuffer, this.setCallReducerFlags.joinToRoomFlags);
-  }
+	joinToRoom(roomId: number, password: string | undefined) {
+		const __args = { roomId, password };
+		let __writer = new BinaryWriter(1024);
+		JoinToRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'join_to_room',
+			__argsBuffer,
+			this.setCallReducerFlags.joinToRoomFlags
+		);
+	}
 
-  onJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void) {
-    this.connection.onReducer("join_to_room", callback);
-  }
+	onJoinToRoom(
+		callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void
+	) {
+		this.connection.onReducer('join_to_room', callback);
+	}
 
-  removeOnJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void) {
-    this.connection.offReducer("join_to_room", callback);
-  }
+	removeOnJoinToRoom(
+		callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void
+	) {
+		this.connection.offReducer('join_to_room', callback);
+	}
 
-  joinToTeam(teamId: number) {
-    const __args = { teamId };
-    let __writer = new BinaryWriter(1024);
-    JoinToTeam.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("join_to_team", __argsBuffer, this.setCallReducerFlags.joinToTeamFlags);
-  }
+	joinToTeam(teamId: number) {
+		const __args = { teamId };
+		let __writer = new BinaryWriter(1024);
+		JoinToTeam.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'join_to_team',
+			__argsBuffer,
+			this.setCallReducerFlags.joinToTeamFlags
+		);
+	}
 
-  onJoinToTeam(callback: (ctx: ReducerEventContext, teamId: number) => void) {
-    this.connection.onReducer("join_to_team", callback);
-  }
+	onJoinToTeam(callback: (ctx: ReducerEventContext, teamId: number) => void) {
+		this.connection.onReducer('join_to_team', callback);
+	}
 
-  removeOnJoinToTeam(callback: (ctx: ReducerEventContext, teamId: number) => void) {
-    this.connection.offReducer("join_to_team", callback);
-  }
+	removeOnJoinToTeam(callback: (ctx: ReducerEventContext, teamId: number) => void) {
+		this.connection.offReducer('join_to_team', callback);
+	}
 
-  leaveRoom() {
-    this.connection.callReducer("leave_room", new Uint8Array(0), this.setCallReducerFlags.leaveRoomFlags);
-  }
+	leaveRoom() {
+		this.connection.callReducer(
+			'leave_room',
+			new Uint8Array(0),
+			this.setCallReducerFlags.leaveRoomFlags
+		);
+	}
 
-  onLeaveRoom(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("leave_room", callback);
-  }
+	onLeaveRoom(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('leave_room', callback);
+	}
 
-  removeOnLeaveRoom(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("leave_room", callback);
-  }
+	removeOnLeaveRoom(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('leave_room', callback);
+	}
 
-  restartGameHasWinner() {
-    this.connection.callReducer("restart_game_has_winner", new Uint8Array(0), this.setCallReducerFlags.restartGameHasWinnerFlags);
-  }
+	restartGameHasWinner() {
+		this.connection.callReducer(
+			'restart_game_has_winner',
+			new Uint8Array(0),
+			this.setCallReducerFlags.restartGameHasWinnerFlags
+		);
+	}
 
-  onRestartGameHasWinner(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("restart_game_has_winner", callback);
-  }
+	onRestartGameHasWinner(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('restart_game_has_winner', callback);
+	}
 
-  removeOnRestartGameHasWinner(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("restart_game_has_winner", callback);
-  }
+	removeOnRestartGameHasWinner(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('restart_game_has_winner', callback);
+	}
 
-  restartGameTableFull() {
-    this.connection.callReducer("restart_game_table_full", new Uint8Array(0), this.setCallReducerFlags.restartGameTableFullFlags);
-  }
+	restartGameTableFull() {
+		this.connection.callReducer(
+			'restart_game_table_full',
+			new Uint8Array(0),
+			this.setCallReducerFlags.restartGameTableFullFlags
+		);
+	}
 
-  onRestartGameTableFull(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("restart_game_table_full", callback);
-  }
+	onRestartGameTableFull(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.onReducer('restart_game_table_full', callback);
+	}
 
-  removeOnRestartGameTableFull(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("restart_game_table_full", callback);
-  }
+	removeOnRestartGameTableFull(callback: (ctx: ReducerEventContext) => void) {
+		this.connection.offReducer('restart_game_table_full', callback);
+	}
 
-  sendMessage(text: string) {
-    const __args = { text };
-    let __writer = new BinaryWriter(1024);
-    SendMessage.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("send_message", __argsBuffer, this.setCallReducerFlags.sendMessageFlags);
-  }
+	sendMessage(text: string) {
+		const __args = { text };
+		let __writer = new BinaryWriter(1024);
+		SendMessage.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer(
+			'send_message',
+			__argsBuffer,
+			this.setCallReducerFlags.sendMessageFlags
+		);
+	}
 
-  onSendMessage(callback: (ctx: ReducerEventContext, text: string) => void) {
-    this.connection.onReducer("send_message", callback);
-  }
+	onSendMessage(callback: (ctx: ReducerEventContext, text: string) => void) {
+		this.connection.onReducer('send_message', callback);
+	}
 
-  removeOnSendMessage(callback: (ctx: ReducerEventContext, text: string) => void) {
-    this.connection.offReducer("send_message", callback);
-  }
+	removeOnSendMessage(callback: (ctx: ReducerEventContext, text: string) => void) {
+		this.connection.offReducer('send_message', callback);
+	}
 
-  setName(name: string) {
-    const __args = { name };
-    let __writer = new BinaryWriter(1024);
-    SetName.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("set_name", __argsBuffer, this.setCallReducerFlags.setNameFlags);
-  }
+	setName(name: string) {
+		const __args = { name };
+		let __writer = new BinaryWriter(1024);
+		SetName.getTypeScriptAlgebraicType().serialize(__writer, __args);
+		let __argsBuffer = __writer.getBuffer();
+		this.connection.callReducer('set_name', __argsBuffer, this.setCallReducerFlags.setNameFlags);
+	}
 
-  onSetName(callback: (ctx: ReducerEventContext, name: string) => void) {
-    this.connection.onReducer("set_name", callback);
-  }
+	onSetName(callback: (ctx: ReducerEventContext, name: string) => void) {
+		this.connection.onReducer('set_name', callback);
+	}
 
-  removeOnSetName(callback: (ctx: ReducerEventContext, name: string) => void) {
-    this.connection.offReducer("set_name", callback);
-  }
-
+	removeOnSetName(callback: (ctx: ReducerEventContext, name: string) => void) {
+		this.connection.offReducer('set_name', callback);
+	}
 }
 
 export class SetReducerFlags {
-  autoDeleteGameHistoryFlags: CallReducerFlags = 'FullUpdate';
-  autoDeleteGameHistory(flags: CallReducerFlags) {
-    this.autoDeleteGameHistoryFlags = flags;
-  }
+	autoDeleteGameHistoryFlags: CallReducerFlags = 'FullUpdate';
+	autoDeleteGameHistory(flags: CallReducerFlags) {
+		this.autoDeleteGameHistoryFlags = flags;
+	}
 
-  autoDeleteRoomIfAllOfflineFlags: CallReducerFlags = 'FullUpdate';
-  autoDeleteRoomIfAllOffline(flags: CallReducerFlags) {
-    this.autoDeleteRoomIfAllOfflineFlags = flags;
-  }
+	autoDeleteRoomIfAllOfflineFlags: CallReducerFlags = 'FullUpdate';
+	autoDeleteRoomIfAllOffline(flags: CallReducerFlags) {
+		this.autoDeleteRoomIfAllOfflineFlags = flags;
+	}
 
-  createGameFlags: CallReducerFlags = 'FullUpdate';
-  createGame(flags: CallReducerFlags) {
-    this.createGameFlags = flags;
-  }
+	createGameFlags: CallReducerFlags = 'FullUpdate';
+	createGame(flags: CallReducerFlags) {
+		this.createGameFlags = flags;
+	}
 
-  createRoomFlags: CallReducerFlags = 'FullUpdate';
-  createRoom(flags: CallReducerFlags) {
-    this.createRoomFlags = flags;
-  }
+	createRoomFlags: CallReducerFlags = 'FullUpdate';
+	createRoom(flags: CallReducerFlags) {
+		this.createRoomFlags = flags;
+	}
 
-  dropPieceFlags: CallReducerFlags = 'FullUpdate';
-  dropPiece(flags: CallReducerFlags) {
-    this.dropPieceFlags = flags;
-  }
+	dropPieceFlags: CallReducerFlags = 'FullUpdate';
+	dropPiece(flags: CallReducerFlags) {
+		this.dropPieceFlags = flags;
+	}
 
-  helloFlags: CallReducerFlags = 'FullUpdate';
-  hello(flags: CallReducerFlags) {
-    this.helloFlags = flags;
-  }
+	helloFlags: CallReducerFlags = 'FullUpdate';
+	hello(flags: CallReducerFlags) {
+		this.helloFlags = flags;
+	}
 
-  helloWithTextFlags: CallReducerFlags = 'FullUpdate';
-  helloWithText(flags: CallReducerFlags) {
-    this.helloWithTextFlags = flags;
-  }
+	helloWithTextFlags: CallReducerFlags = 'FullUpdate';
+	helloWithText(flags: CallReducerFlags) {
+		this.helloWithTextFlags = flags;
+	}
 
-  joinToRoomFlags: CallReducerFlags = 'FullUpdate';
-  joinToRoom(flags: CallReducerFlags) {
-    this.joinToRoomFlags = flags;
-  }
+	joinToRoomFlags: CallReducerFlags = 'FullUpdate';
+	joinToRoom(flags: CallReducerFlags) {
+		this.joinToRoomFlags = flags;
+	}
 
-  joinToTeamFlags: CallReducerFlags = 'FullUpdate';
-  joinToTeam(flags: CallReducerFlags) {
-    this.joinToTeamFlags = flags;
-  }
+	joinToTeamFlags: CallReducerFlags = 'FullUpdate';
+	joinToTeam(flags: CallReducerFlags) {
+		this.joinToTeamFlags = flags;
+	}
 
-  leaveRoomFlags: CallReducerFlags = 'FullUpdate';
-  leaveRoom(flags: CallReducerFlags) {
-    this.leaveRoomFlags = flags;
-  }
+	leaveRoomFlags: CallReducerFlags = 'FullUpdate';
+	leaveRoom(flags: CallReducerFlags) {
+		this.leaveRoomFlags = flags;
+	}
 
-  restartGameHasWinnerFlags: CallReducerFlags = 'FullUpdate';
-  restartGameHasWinner(flags: CallReducerFlags) {
-    this.restartGameHasWinnerFlags = flags;
-  }
+	restartGameHasWinnerFlags: CallReducerFlags = 'FullUpdate';
+	restartGameHasWinner(flags: CallReducerFlags) {
+		this.restartGameHasWinnerFlags = flags;
+	}
 
-  restartGameTableFullFlags: CallReducerFlags = 'FullUpdate';
-  restartGameTableFull(flags: CallReducerFlags) {
-    this.restartGameTableFullFlags = flags;
-  }
+	restartGameTableFullFlags: CallReducerFlags = 'FullUpdate';
+	restartGameTableFull(flags: CallReducerFlags) {
+		this.restartGameTableFullFlags = flags;
+	}
 
-  sendMessageFlags: CallReducerFlags = 'FullUpdate';
-  sendMessage(flags: CallReducerFlags) {
-    this.sendMessageFlags = flags;
-  }
+	sendMessageFlags: CallReducerFlags = 'FullUpdate';
+	sendMessage(flags: CallReducerFlags) {
+		this.sendMessageFlags = flags;
+	}
 
-  setNameFlags: CallReducerFlags = 'FullUpdate';
-  setName(flags: CallReducerFlags) {
-    this.setNameFlags = flags;
-  }
-
+	setNameFlags: CallReducerFlags = 'FullUpdate';
+	setName(flags: CallReducerFlags) {
+		this.setNameFlags = flags;
+	}
 }
 
 export class RemoteTables {
-  constructor(private connection: DbConnectionImpl) {}
+	constructor(private connection: DbConnectionImpl) {}
 
-  get autoDeleteGameHistoryTimer(): AutoDeleteGameHistoryTimerTableHandle {
-    return new AutoDeleteGameHistoryTimerTableHandle(this.connection.clientCache.getOrCreateTable<AutoDeleteGameHistoryTimer>(REMOTE_MODULE.tables.auto_delete_game_history_timer));
-  }
+	get autoDeleteGameHistoryTimer(): AutoDeleteGameHistoryTimerTableHandle {
+		return new AutoDeleteGameHistoryTimerTableHandle(
+			this.connection.clientCache.getOrCreateTable<AutoDeleteGameHistoryTimer>(
+				REMOTE_MODULE.tables.auto_delete_game_history_timer
+			)
+		);
+	}
 
-  get autoDeleteRoomTimer(): AutoDeleteRoomTimerTableHandle {
-    return new AutoDeleteRoomTimerTableHandle(this.connection.clientCache.getOrCreateTable<AutoDeleteRoomTimer>(REMOTE_MODULE.tables.auto_delete_room_timer));
-  }
+	get autoDeleteRoomTimer(): AutoDeleteRoomTimerTableHandle {
+		return new AutoDeleteRoomTimerTableHandle(
+			this.connection.clientCache.getOrCreateTable<AutoDeleteRoomTimer>(
+				REMOTE_MODULE.tables.auto_delete_room_timer
+			)
+		);
+	}
 
-  get game(): GameTableHandle {
-    return new GameTableHandle(this.connection.clientCache.getOrCreateTable<Game>(REMOTE_MODULE.tables.game));
-  }
+	get game(): GameTableHandle {
+		return new GameTableHandle(
+			this.connection.clientCache.getOrCreateTable<Game>(REMOTE_MODULE.tables.game)
+		);
+	}
 
-  get gameCurrentTeam(): GameCurrentTeamTableHandle {
-    return new GameCurrentTeamTableHandle(this.connection.clientCache.getOrCreateTable<GameCurrentTeam>(REMOTE_MODULE.tables.game_current_team));
-  }
+	get gameCurrentTeam(): GameCurrentTeamTableHandle {
+		return new GameCurrentTeamTableHandle(
+			this.connection.clientCache.getOrCreateTable<GameCurrentTeam>(
+				REMOTE_MODULE.tables.game_current_team
+			)
+		);
+	}
 
-  get gameHistory(): GameHistoryTableHandle {
-    return new GameHistoryTableHandle(this.connection.clientCache.getOrCreateTable<GameHistory>(REMOTE_MODULE.tables.game_history));
-  }
+	get gameHistory(): GameHistoryTableHandle {
+		return new GameHistoryTableHandle(
+			this.connection.clientCache.getOrCreateTable<GameHistory>(REMOTE_MODULE.tables.game_history)
+		);
+	}
 
-  get hasDroppedPieceToGame(): HasDroppedPieceToGameTableHandle {
-    return new HasDroppedPieceToGameTableHandle(this.connection.clientCache.getOrCreateTable<HasDroppedPieceToGame>(REMOTE_MODULE.tables.has_dropped_piece_to_game));
-  }
+	get hasDroppedPieceToGame(): HasDroppedPieceToGameTableHandle {
+		return new HasDroppedPieceToGameTableHandle(
+			this.connection.clientCache.getOrCreateTable<HasDroppedPieceToGame>(
+				REMOTE_MODULE.tables.has_dropped_piece_to_game
+			)
+		);
+	}
 
-  get joinRoom(): JoinRoomTableHandle {
-    return new JoinRoomTableHandle(this.connection.clientCache.getOrCreateTable<JoinRoom>(REMOTE_MODULE.tables.join_room));
-  }
+	get joinRoom(): JoinRoomTableHandle {
+		return new JoinRoomTableHandle(
+			this.connection.clientCache.getOrCreateTable<JoinRoom>(REMOTE_MODULE.tables.join_room)
+		);
+	}
 
-  get joinTeam(): JoinTeamTableHandle {
-    return new JoinTeamTableHandle(this.connection.clientCache.getOrCreateTable<JoinTeam>(REMOTE_MODULE.tables.join_team));
-  }
+	get joinTeam(): JoinTeamTableHandle {
+		return new JoinTeamTableHandle(
+			this.connection.clientCache.getOrCreateTable<JoinTeam>(REMOTE_MODULE.tables.join_team)
+		);
+	}
 
-  get message(): MessageTableHandle {
-    return new MessageTableHandle(this.connection.clientCache.getOrCreateTable<Message>(REMOTE_MODULE.tables.message));
-  }
+	get message(): MessageTableHandle {
+		return new MessageTableHandle(
+			this.connection.clientCache.getOrCreateTable<Message>(REMOTE_MODULE.tables.message)
+		);
+	}
 
-  get player(): PlayerTableHandle {
-    return new PlayerTableHandle(this.connection.clientCache.getOrCreateTable<Player>(REMOTE_MODULE.tables.player));
-  }
+	get player(): PlayerTableHandle {
+		return new PlayerTableHandle(
+			this.connection.clientCache.getOrCreateTable<Player>(REMOTE_MODULE.tables.player)
+		);
+	}
 
-  get room(): RoomTableHandle {
-    return new RoomTableHandle(this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room));
-  }
+	get room(): RoomTableHandle {
+		return new RoomTableHandle(
+			this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room)
+		);
+	}
 
-  get roomPassword(): RoomPasswordTableHandle {
-    return new RoomPasswordTableHandle(this.connection.clientCache.getOrCreateTable<RoomPassword>(REMOTE_MODULE.tables.room_password));
-  }
+	get roomPassword(): RoomPasswordTableHandle {
+		return new RoomPasswordTableHandle(
+			this.connection.clientCache.getOrCreateTable<RoomPassword>(REMOTE_MODULE.tables.room_password)
+		);
+	}
 
-  get statsOneMonth(): StatsOneMonthTableHandle {
-    return new StatsOneMonthTableHandle(this.connection.clientCache.getOrCreateTable<StatsOneMonth>(REMOTE_MODULE.tables.stats_one_month));
-  }
+	get statsOneMonth(): StatsOneMonthTableHandle {
+		return new StatsOneMonthTableHandle(
+			this.connection.clientCache.getOrCreateTable<StatsOneMonth>(
+				REMOTE_MODULE.tables.stats_one_month
+			)
+		);
+	}
 
-  get team(): TeamTableHandle {
-    return new TeamTableHandle(this.connection.clientCache.getOrCreateTable<Team>(REMOTE_MODULE.tables.team));
-  }
+	get team(): TeamTableHandle {
+		return new TeamTableHandle(
+			this.connection.clientCache.getOrCreateTable<Team>(REMOTE_MODULE.tables.team)
+		);
+	}
 }
 
-export class SubscriptionBuilder extends SubscriptionBuilderImpl<RemoteTables, RemoteReducers, SetReducerFlags> { }
+export class SubscriptionBuilder extends SubscriptionBuilderImpl<
+	RemoteTables,
+	RemoteReducers,
+	SetReducerFlags
+> {}
 
 export class DbConnection extends DbConnectionImpl<RemoteTables, RemoteReducers, SetReducerFlags> {
-  static builder = (): DbConnectionBuilder<DbConnection, ErrorContext, SubscriptionEventContext> => {
-    return new DbConnectionBuilder<DbConnection, ErrorContext, SubscriptionEventContext>(REMOTE_MODULE, (imp: DbConnectionImpl) => imp as DbConnection);
-  }
-  subscriptionBuilder = (): SubscriptionBuilder => {
-    return new SubscriptionBuilder(this);
-  }
+	static builder = (): DbConnectionBuilder<
+		DbConnection,
+		ErrorContext,
+		SubscriptionEventContext
+	> => {
+		return new DbConnectionBuilder<DbConnection, ErrorContext, SubscriptionEventContext>(
+			REMOTE_MODULE,
+			(imp: DbConnectionImpl) => imp as DbConnection
+		);
+	};
+	subscriptionBuilder = (): SubscriptionBuilder => {
+		return new SubscriptionBuilder(this);
+	};
 }
 
-export type EventContext = EventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags, Reducer>;
-export type ReducerEventContext = ReducerEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags, Reducer>;
-export type SubscriptionEventContext = SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>;
+export type EventContext = EventContextInterface<
+	RemoteTables,
+	RemoteReducers,
+	SetReducerFlags,
+	Reducer
+>;
+export type ReducerEventContext = ReducerEventContextInterface<
+	RemoteTables,
+	RemoteReducers,
+	SetReducerFlags,
+	Reducer
+>;
+export type SubscriptionEventContext = SubscriptionEventContextInterface<
+	RemoteTables,
+	RemoteReducers,
+	SetReducerFlags
+>;
 export type ErrorContext = ErrorContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>;

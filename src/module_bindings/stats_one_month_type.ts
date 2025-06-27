@@ -7,61 +7,58 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 export type StatsOneMonth = {
-  player: Identity,
-  wins: number,
-  total: number,
+	player: Identity;
+	wins: number;
+	total: number;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace StatsOneMonth {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("player", AlgebraicType.createIdentityType()),
-      new ProductTypeElement("wins", AlgebraicType.createU32Type()),
-      new ProductTypeElement("total", AlgebraicType.createU32Type()),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('player', AlgebraicType.createIdentityType()),
+			new ProductTypeElement('wins', AlgebraicType.createU32Type()),
+			new ProductTypeElement('total', AlgebraicType.createU32Type())
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: StatsOneMonth): void {
-    StatsOneMonth.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: StatsOneMonth): void {
+		StatsOneMonth.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): StatsOneMonth {
-    return StatsOneMonth.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): StatsOneMonth {
+		return StatsOneMonth.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-
-

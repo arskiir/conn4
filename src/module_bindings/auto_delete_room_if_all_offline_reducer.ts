@@ -7,59 +7,57 @@
 /* tslint:disable */
 // @ts-nocheck
 import {
-  AlgebraicType,
-  AlgebraicValue,
-  BinaryReader,
-  BinaryWriter,
-  ConnectionId,
-  DbConnectionBuilder,
-  DbConnectionImpl,
-  Identity,
-  ProductType,
-  ProductTypeElement,
-  SubscriptionBuilderImpl,
-  SumType,
-  SumTypeVariant,
-  TableCache,
-  TimeDuration,
-  Timestamp,
-  deepEqual,
-  type CallReducerFlags,
-  type DbContext,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
-  type SubscriptionEventContextInterface,
-} from "@clockworklabs/spacetimedb-sdk";
+	AlgebraicType,
+	AlgebraicValue,
+	BinaryReader,
+	BinaryWriter,
+	ConnectionId,
+	DbConnectionBuilder,
+	DbConnectionImpl,
+	Identity,
+	ProductType,
+	ProductTypeElement,
+	SubscriptionBuilderImpl,
+	SumType,
+	SumTypeVariant,
+	TableCache,
+	TimeDuration,
+	Timestamp,
+	deepEqual,
+	type CallReducerFlags,
+	type DbContext,
+	type ErrorContextInterface,
+	type Event,
+	type EventContextInterface,
+	type ReducerEventContextInterface,
+	type SubscriptionEventContextInterface
+} from '@clockworklabs/spacetimedb-sdk';
 
-import { AutoDeleteRoomTimer as __AutoDeleteRoomTimer } from "./auto_delete_room_timer_type";
+import { AutoDeleteRoomTimer as __AutoDeleteRoomTimer } from './auto_delete_room_timer_type';
 
 export type AutoDeleteRoomIfAllOffline = {
-  timer: __AutoDeleteRoomTimer,
+	timer: __AutoDeleteRoomTimer;
 };
 
 /**
  * A namespace for generated helper functions.
  */
 export namespace AutoDeleteRoomIfAllOffline {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  export function getTypeScriptAlgebraicType(): AlgebraicType {
-    return AlgebraicType.createProductType([
-      new ProductTypeElement("timer", __AutoDeleteRoomTimer.getTypeScriptAlgebraicType()),
-    ]);
-  }
+	/**
+	 * A function which returns this type represented as an AlgebraicType.
+	 * This function is derived from the AlgebraicType used to generate this type.
+	 */
+	export function getTypeScriptAlgebraicType(): AlgebraicType {
+		return AlgebraicType.createProductType([
+			new ProductTypeElement('timer', __AutoDeleteRoomTimer.getTypeScriptAlgebraicType())
+		]);
+	}
 
-  export function serialize(writer: BinaryWriter, value: AutoDeleteRoomIfAllOffline): void {
-    AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().serialize(writer, value);
-  }
+	export function serialize(writer: BinaryWriter, value: AutoDeleteRoomIfAllOffline): void {
+		AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().serialize(writer, value);
+	}
 
-  export function deserialize(reader: BinaryReader): AutoDeleteRoomIfAllOffline {
-    return AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().deserialize(reader);
-  }
-
+	export function deserialize(reader: BinaryReader): AutoDeleteRoomIfAllOffline {
+		return AutoDeleteRoomIfAllOffline.getTypeScriptAlgebraicType().deserialize(reader);
+	}
 }
-
