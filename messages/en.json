@@ -37,11 +37,16 @@
 	"every_fancy_bat_ask": "Wins / Total",
 	"just_maroon_insect_soar": "Leaderboard",
 	"witty_few_owl_amaze": "Last 30 Days",
-	"password_optional": "Password (optional)",
 	"enter_room_password": "Enter Room Password",
 	"room_requires_password": "Room \"{title}\" requires a password to join.",
 	"enter_password_placeholder": "Enter password...",
 	"join_room": "Join Room",
 	"joining": "Joining...",
+	"creating": "Creating...",
+	"create_room_description": "Create a new game room for others to join",
+	"room_name_hint": "This will be displayed to other players",
+	"room_password_label": "Room Password",
+	"room_password_placeholder": "Leave empty for public room",
+	"room_password_hint": "Set a password to make the room private",
 	"incorrect_password": "Incorrect password. Please try again."
 }

@@ -37,11 +37,16 @@
 	"every_fancy_bat_ask": "ชนะ / ทั้งหมด",
 	"just_maroon_insect_soar": "กระดานผู้นำ",
 	"witty_few_owl_amaze": "30 วันที่ผ่านมา",
-	"password_optional": "รหัสผ่าน (ไม่บังคับ)",
 	"enter_room_password": "ใส่รหัสผ่านห้อง",
 	"room_requires_password": "ห้อง \"{title}\" ต้องการรหัสผ่านในการเข้าร่วม",
 	"enter_password_placeholder": "ใส่รหัสผ่าน...",
 	"join_room": "เข้าร่วมห้อง",
 	"joining": "กำลังเข้าร่วม...",
+	"creating": "กำลังสร้าง...",
+	"create_room_description": "สร้างห้องเกมใหม่สำหรับผู้เล่นคนอื่นเข้าร่วม",
+	"room_name_hint": "ข้อมูลนี้จะแสดงให้ผู้เล่นคนอื่นเห็น",
+	"room_password_label": "รหัสผ่านห้อง",
+	"room_password_placeholder": "ปล่อยว่างไว้สำหรับห้องสาธารณะ",
+	"room_password_hint": "ตั้งรหัสผ่านเพื่อทำให้ห้องเป็นส่วนตัว",
 	"incorrect_password": "รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง"
 }

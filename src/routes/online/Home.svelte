@@ -22,6 +22,7 @@
 	let nameUpdating = $state(false);
 	let nameEditing = $state(false);
 	let creatingRoom = $state(false);
+	let showCreateRoomModal = $state(false);
 
 	const useRooms = new UseRooms(conn);
 	export function stopUseRooms() {
@@ -58,6 +59,7 @@
 			console.error('Failed to create room:', ctx.event.status.value);
 		}
 		creatingRoom = false;
+		showCreateRoomModal = false;
 		conn.reducers.removeOnCreateRoom(onCreateRoom);
 	};
 
@@ -90,6 +92,14 @@
 		creatingRoom = true;
 		conn.reducers.createRoom(title, password);
 		conn.reducers.onCreateRoom(onCreateRoom);
+	}
+
+	function openCreateRoomModal() {
+		showCreateRoomModal = true;
+	}
+
+	function cancelCreateRoom() {
+		showCreateRoomModal = false;
 	}
 
 	function joinRoom(room: Room) {
@@ -179,34 +189,13 @@
 	{#if you.name}
 		<div class="space-y-4">
 			<div>
-				<form
-					onsubmit={createRoom}
-					class="dropdown dropdown-hover dropdown-center"
+				<button 
+					type="button" 
+					class="btn btn-primary" 
+					onclick={openCreateRoomModal}
 				>
-					<button type="submit" class="btn btn-primary" disabled={creatingRoom}
-						>{m.great_suave_dolphin_achieve()}{#if creatingRoom}
-							<span class="loading loading-spinner loading-md"></span>
-						{/if}</button
-					>
-					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-					<div
-						tabindex="0"
-						class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm space-y-2"
-					>
-						<input
-							type="text"
-							name="title"
-							placeholder={m.room_name()}
-							class="input input-bordered w-full max-w-xs"
-						/>
-						<input
-							type="password"
-							name="password"
-							placeholder={m.password_optional()}
-							class="input input-bordered w-full max-w-xs"
-						/>
-					</div>
-				</form>
+					{m.great_suave_dolphin_achieve()}
+				</button>
 			</div>
 
 			<a href="/online/leaderboard" class="btn btn-outline btn-secondary btn-sm"
@@ -234,6 +223,94 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Create Room Modal -->
+{#if showCreateRoomModal}
+	<dialog class="modal modal-open">
+		<div class="modal-box max-w-md text-left space-y-6">
+			<!-- Header -->
+				<div class="text-center">
+					<h3 class="font-bold text-xl text-base-content">{m.great_suave_dolphin_achieve()}</h3>
+					<p class="text-sm text-base-content/70">{m.create_room_description()}</p>
+				</div>
+
+			<form
+				onsubmit={createRoom}
+				class="space-y-4"
+			>
+				<!-- Room Name Field -->
+				<div>
+					<label class="label" for="room-title">
+						<span class="font-medium text-base-content">{m.room_name()}</span>
+					</label>
+					<input
+						id="room-title"
+						type="text"
+						name="title"
+						placeholder={you.name ?? '???'}
+						class="input input-bordered w-full focus:input-primary transition-colors"
+						disabled={creatingRoom}
+					/>
+					<div class="label">
+						<span class="text-base-content/60 text-sm">{m.room_name_hint()}</span>
+					</div>
+				</div>
+				
+				<!-- Password Field -->
+				<div>
+					<label class="label" for="room-password">
+						<span class="font-medium text-base-content">{m.room_password_label()}</span>
+					</label>
+					<div class="relative">
+						<input
+							id="room-password"
+							type="password"
+							name="password"
+							placeholder={m.room_password_placeholder()}
+							class="input input-bordered w-full focus:input-primary transition-colors pr-10"
+							disabled={creatingRoom}
+						/>
+						<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+							<svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+							</svg>
+						</div>
+					</div>
+					<div class="label">
+						<span class="text-base-content/60 text-sm">{m.room_password_hint()}</span>
+					</div>
+				</div>
+				
+				<!-- Action Buttons -->
+				<div class="modal-action pt-4">
+					<button 
+						type="button" 
+						class="btn btn-ghost" 
+						onclick={cancelCreateRoom} 
+						disabled={creatingRoom}
+					>
+						{m.cancel()}
+					</button>
+					<button 
+						type="submit" 
+						class="btn btn-primary min-w-[120px]" 
+						disabled={creatingRoom}
+					>
+						{#if creatingRoom}
+							<span class="loading loading-spinner loading-sm"></span>
+							{m.creating()}
+						{:else}
+							{m.great_suave_dolphin_achieve()}
+						{/if}
+					</button>
+				</div>
+			</form>
+		</div>
+		<form method="dialog" class="modal-backdrop">
+			<button onclick={cancelCreateRoom}>close</button>
+		</form>
+	</dialog>
+{/if}
 
 <!-- Password Modal -->
 {#if showPasswordModal && roomToJoin}
