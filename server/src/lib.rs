@@ -783,6 +783,8 @@ fn validate_room_title(title: &str) -> Result<(), String> {
 fn validate_room_password(password: &str) -> Result<(), String> {
     if password.is_empty() {
         Err("Room password must not be empty".to_string())
+    } else if password.len() > 64 {
+        Err("Room password must not exceed 64 characters".to_string())
     } else {
         Ok(())
     }

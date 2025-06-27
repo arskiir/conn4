@@ -9,6 +9,9 @@
 	const CREATE_ROOM_MODAL_ID = 'create_room_modal';
 	const PASSWORD_MODAL_ID = 'password_modal';
 
+	// Constants
+	const MAX_PASSWORD_LENGTH = 64;
+
 	// Modal utility functions
 	function openModal(modalId: string) {
 		(document.getElementById(modalId) as HTMLDialogElement)?.showModal();
@@ -35,6 +38,7 @@
 	let nameUpdating = $state(false);
 	let nameEditing = $state(false);
 	let creatingRoom = $state(false);
+	let roomPassword = $state('');
 
 	const useRooms = new UseRooms(conn);
 	export function stopUseRooms() {
@@ -107,7 +111,12 @@
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget as HTMLFormElement);
 		const title = (formData.get('title') as string)?.trim() || (you.name ?? m.unknown_user());
-		const password = (formData.get('password') as string)?.trim() || undefined;
+		const password = roomPassword.trim() || undefined;
+
+		// Client-side validation
+		if (password && password.length > MAX_PASSWORD_LENGTH) {
+			return; // Form validation will handle the error display
+		}
 
 		creatingRoom = true;
 		conn.reducers.createRoom(title, password);
@@ -120,6 +129,7 @@
 
 	function cancelCreateRoom() {
 		closeModal(CREATE_ROOM_MODAL_ID);
+		roomPassword = ''; // Reset password field
 	}
 
 	function joinRoom(room: Room) {
@@ -140,6 +150,12 @@
 
 		const password = passwordInput.trim();
 		if (!password) return;
+
+		// Client-side validation
+		if (password.length > MAX_PASSWORD_LENGTH) {
+			passwordError = `Password must not exceed ${MAX_PASSWORD_LENGTH} characters`;
+			return;
+		}
 
 		passwordError = '';
 		joiningWithPassword = true;
@@ -278,7 +294,10 @@
 						name="password"
 						placeholder={m.room_password_placeholder()}
 						class="input input-bordered focus:input-primary w-full pr-10 transition-colors"
+						class:input-error={roomPassword.length > MAX_PASSWORD_LENGTH}
 						disabled={creatingRoom}
+						bind:value={roomPassword}
+						maxlength={MAX_PASSWORD_LENGTH}
 					/>
 					<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
 						<svg
@@ -298,6 +317,12 @@
 				</div>
 				<div class="label">
 					<span class="text-base-content/60 text-sm">{m.room_password_hint()}</span>
+					<span
+						class="text-base-content/60 text-xs"
+						class:text-error={roomPassword.length > MAX_PASSWORD_LENGTH}
+					>
+						{roomPassword.length}/{MAX_PASSWORD_LENGTH}
+					</span>
 				</div>
 			</div>
 
@@ -333,15 +358,27 @@
 		<h3 class="text-lg font-bold">{m.enter_room_password()}</h3>
 		<p class="py-4">{m.room_requires_password({ title: roomToJoin?.title ?? '' })}</p>
 		<form onsubmit={joinRoomWithPassword} class="space-y-4">
-			<input
-				type="password"
-				name="password"
-				placeholder={m.enter_password_placeholder()}
-				class="input input-bordered w-full"
-				class:input-error={passwordError}
-				disabled={joiningWithPassword}
-				bind:value={passwordInput}
-			/>
+			<div>
+				<input
+					type="password"
+					name="password"
+					placeholder={m.enter_password_placeholder()}
+					class="input input-bordered w-full"
+					class:input-error={passwordError || passwordInput.length > MAX_PASSWORD_LENGTH}
+					disabled={joiningWithPassword}
+					bind:value={passwordInput}
+					maxlength={MAX_PASSWORD_LENGTH}
+				/>
+				<div class="label">
+					<span></span>
+					<span
+						class="text-base-content/60 text-xs"
+						class:text-error={passwordInput.length > MAX_PASSWORD_LENGTH}
+					>
+						{passwordInput.length}/{MAX_PASSWORD_LENGTH}
+					</span>
+				</div>
+			</div>
 			{#if passwordError}
 				<p class="text-error text-sm">{passwordError}</p>
 			{/if}
