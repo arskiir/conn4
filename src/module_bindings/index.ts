@@ -78,6 +78,8 @@ import { GameCurrentTeamTableHandle } from "./game_current_team_table.ts";
 export { GameCurrentTeamTableHandle };
 import { GameHistoryTableHandle } from "./game_history_table.ts";
 export { GameHistoryTableHandle };
+import { HasDroppedPieceToGameTableHandle } from "./has_dropped_piece_to_game_table.ts";
+export { HasDroppedPieceToGameTableHandle };
 import { JoinRoomTableHandle } from "./join_room_table.ts";
 export { JoinRoomTableHandle };
 import { JoinTeamTableHandle } from "./join_team_table.ts";
@@ -108,6 +110,8 @@ import { GameCurrentTeam } from "./game_current_team_type.ts";
 export { GameCurrentTeam };
 import { GameHistory } from "./game_history_type.ts";
 export { GameHistory };
+import { HasDroppedPieceToGame } from "./has_dropped_piece_to_game_type.ts";
+export { HasDroppedPieceToGame };
 import { JoinRoom } from "./join_room_type.ts";
 export { JoinRoom };
 import { JoinTeam } from "./join_team_type.ts";
@@ -170,6 +174,15 @@ const REMOTE_MODULE = {
       primaryKeyInfo: {
         colName: "id",
         colType: GameHistory.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
+      },
+    },
+    has_dropped_piece_to_game: {
+      tableName: "has_dropped_piece_to_game",
+      rowType: HasDroppedPieceToGame.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+      primaryKeyInfo: {
+        colName: "id",
+        colType: HasDroppedPieceToGame.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
       },
     },
     join_room: {
@@ -663,6 +676,10 @@ export class RemoteTables {
 
   get gameHistory(): GameHistoryTableHandle {
     return new GameHistoryTableHandle(this.connection.clientCache.getOrCreateTable<GameHistory>(REMOTE_MODULE.tables.game_history));
+  }
+
+  get hasDroppedPieceToGame(): HasDroppedPieceToGameTableHandle {
+    return new HasDroppedPieceToGameTableHandle(this.connection.clientCache.getOrCreateTable<HasDroppedPieceToGame>(REMOTE_MODULE.tables.has_dropped_piece_to_game));
   }
 
   get joinRoom(): JoinRoomTableHandle {

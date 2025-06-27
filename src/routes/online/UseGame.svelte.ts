@@ -1,6 +1,6 @@
 import { SubscriptionHandle } from "$lib";
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
-import { type DbConnection, type EventContext, type Game, type GameCurrentTeam, type JoinTeam, type ReducerEventContext, type Team } from "../../module_bindings";
+import { type DbConnection, type EventContext, type Game, type GameCurrentTeam, type HasDroppedPieceToGame, type JoinTeam, type ReducerEventContext, type Team } from "../../module_bindings";
 
 export class UseGame {
     // TODO: Try to refactor so that we can do some union type i.e. if loading is true, game is undefined, if not game is Game or null. Maybe we need to convert the class to a function that returns an object with the correct types.
@@ -72,6 +72,14 @@ export class UseGame {
     private _gameCurrentTeam = $state<GameCurrentTeam | null>(null);
     get gameCurrentTeam() {
         return this._gameCurrentTeam;
+    }
+
+    private readonly hasDroppedPieceToGameHandle: SubscriptionHandle;
+    private readonly hasDroppedPieceToGameOnInsert: (ctx: EventContext, hasDroppedPieceToGame: HasDroppedPieceToGame) => void
+    private readonly hasDroppedPieceToGameOnDelete: (ctx: EventContext, hasDroppedPieceToGame: HasDroppedPieceToGame) => void
+    private _hasDroppedPieceToGames = $state<HasDroppedPieceToGame[]>([]);
+    get hasDroppedPieceToGames() {
+        return this._hasDroppedPieceToGames.length > 0;
     }
 
 
@@ -225,6 +233,36 @@ export class UseGame {
                 console.error('Error fetching teams:', ctx.event);
             })
             .subscribe(`SELECT * FROM team WHERE game_id = '${roomId}'`);
+
+        this.hasDroppedPieceToGameOnInsert = (ctx, hasDroppedPieceToGame) => {
+            this._hasDroppedPieceToGames.push(hasDroppedPieceToGame);
+        }
+        this.hasDroppedPieceToGameOnDelete = (ctx, hasDroppedPieceToGame) => {
+            const index = this._hasDroppedPieceToGames.findIndex(item => item.id === hasDroppedPieceToGame.id);
+            if (index !== -1) {
+                this._hasDroppedPieceToGames.splice(index, 1);
+            }
+        }
+        conn.db.hasDroppedPieceToGame.onInsert(this.hasDroppedPieceToGameOnInsert);
+        conn.db.hasDroppedPieceToGame.onDelete(this.hasDroppedPieceToGameOnDelete);
+
+        this.subscriptions++;
+        this.hasDroppedPieceToGameHandle = conn
+            .subscriptionBuilder()
+            .onApplied(() => {
+                this.activeSubscriptions++;
+                for (const hasDroppedPieceToGame of conn.db.hasDroppedPieceToGame.iter()) {
+                    if (hasDroppedPieceToGame.gameId === roomId && hasDroppedPieceToGame.joiner.data === yourIdentity.data) {
+                        this._hasDroppedPieceToGames.push(hasDroppedPieceToGame);
+                    } else {
+                        throw new Error('HasDroppedPieceToGame from other subscriptions leaked in. Make sure to completely unsubscribe from previous subscriptions first.')
+                    }
+                }
+            })
+            .onError((ctx) => {
+                console.error('Error fetching has dropped piece to game:', ctx.event);
+            })
+            .subscribe(`SELECT * FROM has_dropped_piece_to_game WHERE game_id = '${roomId}' AND joiner = '${yourIdentity.toHexString()}'`);
     }
 
     createGame() {
@@ -332,12 +370,32 @@ export class UseGame {
         })
     }
 
+    private stopHasDroppedPieceToGame() {
+        const removeListeners = () => {
+            this.conn.db.hasDroppedPieceToGame.removeOnInsert(this.hasDroppedPieceToGameOnInsert);
+            this.conn.db.hasDroppedPieceToGame.removeOnDelete(this.hasDroppedPieceToGameOnDelete);
+        }
+
+        return new Promise<void>(resolve => {
+            if (this.hasDroppedPieceToGameHandle.isActive()) {
+                this.hasDroppedPieceToGameHandle.unsubscribeThen(() => {
+                    removeListeners()
+                    resolve();
+                });
+            } else {
+                removeListeners()
+                resolve();
+            }
+        })
+    }
+
     async stop() {
         return Promise.all([
             this.stopGame(),
             this.stopJoinTeam(),
             this.stopGameCurrentTeam(),
             this.stopTeam(),
+            this.stopHasDroppedPieceToGame(),
         ])
     }
 }

@@ -229,6 +229,7 @@
 {#snippet gameArea()}
 	<div class="text-center">
 		{#if useGame.loading}
+			<h1>ff</h1>
 			<span class="loading loading-spinner loading-lg"></span>
 		{:else if readyGameState}
 			<!-- Game is being displayed. -->
@@ -264,7 +265,7 @@
 						{@const oppositeTeam = useGame.oppositeTeam}
 						<button
 							transition:fly={{ y: -10, duration: 150 }}
-							disabled={useGame.gameJoining}
+							disabled={useGame.gameJoining || useGame.hasDroppedPieceToGames}
 							onclick={() => useGame.joinTeam(oppositeTeam.id)}
 							class="btn btn-primary btn-sm md:btn-md"
 							>{m.steep_large_snail_catch({ name: oppositeTeam.name })}</button
@@ -279,7 +280,7 @@
 						{#each useGame.teams as team (team.id)}
 							<li>
 								<button
-									disabled={useGame.gameJoining}
+									disabled={useGame.gameJoining || useGame.hasDroppedPieceToGames}
 									onclick={() => useGame.joinTeam(team.id)}
 									class="btn btn-primary btn-sm md:btn-md"
 									>{m.join_game({

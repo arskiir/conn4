@@ -147,6 +147,7 @@ fn delete_game(ctx: &ReducerContext, by: DeleteGameBy) {
             ctx.db.game().room_id().delete(room_id);
             delete_team(ctx, DeleteTeamBy::GameId(room_id));
             delete_game_current_team(ctx, DeleteGameCurrentTeamBy::GameId(room_id));
+            delete_has_dropped_piece_to_game(ctx, DeleteHasDroppedPieceToGameBy::GameId(room_id));
         }
     }
 }
@@ -278,6 +279,30 @@ fn delete_join_room(ctx: &ReducerContext, by: DeleteJoinRoomBy) {
         }
         DeleteJoinRoomBy::RoomId(room_id) => {
             ctx.db.join_room().room_id().delete(room_id);
+        }
+    }
+}
+
+#[table(name = has_dropped_piece_to_game, public, index(name=game_and_joiner, btree(columns = [game_id, joiner])))]
+pub struct HasDroppedPieceToGame {
+    #[auto_inc]
+    #[primary_key]
+    id: u32,
+    #[index(btree)]
+    game_id: u32,
+    joiner: Identity,
+    #[index(btree)]
+    team_id: u32,
+}
+
+enum DeleteHasDroppedPieceToGameBy {
+    GameId(u32),
+}
+
+fn delete_has_dropped_piece_to_game(ctx: &ReducerContext, by: DeleteHasDroppedPieceToGameBy) {
+    match by {
+        DeleteHasDroppedPieceToGameBy::GameId(game_id) => {
+            ctx.db.has_dropped_piece_to_game().game_id().delete(game_id);
         }
     }
 }
@@ -430,6 +455,8 @@ pub fn restart_game_table_full(ctx: &ReducerContext) -> Result<(), String> {
         return Err("Cannot restart game if the table is not full".to_string());
     }
 
+    delete_has_dropped_piece_to_game(ctx, DeleteHasDroppedPieceToGameBy::GameId(game.room_id));
+
     ctx.db.game().room_id().update(Game::new(game.room_id));
     let game_current_team = ctx
         .db
@@ -449,6 +476,8 @@ pub fn restart_game_has_winner(ctx: &ReducerContext) -> Result<(), String> {
     if game.winner.is_none() {
         return Err("Cannot restart game if there is no winner".to_string());
     }
+
+    delete_has_dropped_piece_to_game(ctx, DeleteHasDroppedPieceToGameBy::GameId(game.room_id));
 
     ctx.db.game().room_id().update(Game::new(game.room_id));
     let game_current_team = ctx
@@ -577,6 +606,15 @@ pub fn drop_piece(ctx: &ReducerContext, column: u32) -> Result<(), String> {
                 y: column,
             });
 
+            ctx.db
+                .has_dropped_piece_to_game()
+                .try_insert(HasDroppedPieceToGame {
+                    id: 0,
+                    game_id: game.room_id,
+                    joiner: ctx.sender,
+                    team_id: jt.team_id,
+                })?;
+
             if let Some(coords) = check_win(&game.table, jt.team_id) {
                 game.winner = Some(Winner {
                     team_id: jt.team_id,
@@ -659,6 +697,17 @@ pub fn join_to_team(ctx: &ReducerContext, team_id: u32) -> Result<(), String> {
         return Err("Cannot join to a game when team does not exist".to_string());
     };
 
+    if ctx
+        .db
+        .has_dropped_piece_to_game()
+        .game_and_joiner()
+        .filter((jr.room_id, ctx.sender))
+        .next()
+        .is_some()
+    {
+        return Err("Cannot change team after dropping a piece".to_string());
+    }
+
     if let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender) {
         if jt.team_id == team.id {
             return Err("Cannot join to the same team".to_string());
@@ -731,6 +780,45 @@ pub fn create_room(ctx: &ReducerContext, title: String) -> Result<(), String> {
     join_to_room(ctx, room.id)
 }
 
+fn rejoin_previous_team(ctx: &ReducerContext, room_id: u32) -> Result<(), String> {
+    // Check if player has dropped a piece in this room before and force them to the same team
+    let previous_drop = ctx
+        .db
+        .has_dropped_piece_to_game()
+        .game_and_joiner()
+        .filter((room_id, ctx.sender))
+        .next();
+
+    let Some(previous_drop) = previous_drop else {
+        return Ok(());
+    };
+
+    // Check if the game and team still exist
+    if ctx.db.game().room_id().find(room_id).is_none() {
+        return Ok(());
+    }
+
+    let Some(team) = ctx.db.team().id().find(previous_drop.team_id) else {
+        return Ok(());
+    };
+
+    if team.game_id != room_id {
+        return Ok(());
+    }
+
+    // Force them to join the same team if they are not already in a team
+    let already_in_team = ctx.db.join_team().joiner().find(ctx.sender).is_some();
+    if !already_in_team {
+        ctx.db.join_team().try_insert(JoinTeam {
+            room_id,
+            joiner: ctx.sender,
+            team_id: previous_drop.team_id,
+        })?;
+    }
+
+    Ok(())
+}
+
 #[reducer]
 pub fn join_to_room(ctx: &ReducerContext, room_id: u32) -> Result<(), String> {
     if ctx.db.join_room().joiner().find(&ctx.sender).is_some() {
@@ -753,6 +841,9 @@ pub fn join_to_room(ctx: &ReducerContext, room_id: u32) -> Result<(), String> {
             joiner: ctx.sender,
             joined_at: ctx.timestamp,
         })?;
+
+        rejoin_previous_team(ctx, room_id)?;
+
         Ok(())
     }
 }
