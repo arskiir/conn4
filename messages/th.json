@@ -49,5 +49,6 @@
 	"room_password_placeholder": "ปล่อยว่างไว้สำหรับห้องสาธารณะ",
 	"room_password_hint": "ตั้งรหัสผ่านเพื่อทำให้ห้องเป็นส่วนตัว",
 	"incorrect_password": "รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง",
+	"password_too_long": "รหัสผ่านต้องไม่เกิน {maxLength} ตัวอักษร",
 	"unknown_user": "ผู้ใช้ที่ไม่ทราบชื่อ"
 }

@@ -49,5 +49,6 @@
 	"room_password_placeholder": "Leave empty for public room",
 	"room_password_hint": "Set a password to make the room private",
 	"incorrect_password": "Incorrect password. Please try again.",
+	"password_too_long": "Password must not exceed {maxLength} characters",
 	"unknown_user": "Unknown User"
 }

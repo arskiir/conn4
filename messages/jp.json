@@ -49,5 +49,6 @@
 	"room_password_placeholder": "公開ルームにする場合は空のままにしてください",
 	"room_password_hint": "パスワードを設定してルームを非公開にします",
 	"incorrect_password": "パスワードが間違っています。もう一度試してください。",
+	"password_too_long": "パスワードは{maxLength}文字以下である必要があります",
 	"unknown_user": "不明なユーザー"
 }

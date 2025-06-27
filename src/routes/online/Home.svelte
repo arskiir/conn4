@@ -153,7 +153,7 @@
 
 		// Client-side validation
 		if (password.length > MAX_PASSWORD_LENGTH) {
-			passwordError = `Password must not exceed ${MAX_PASSWORD_LENGTH} characters`;
+			passwordError = m.password_too_long({ maxLength: MAX_PASSWORD_LENGTH });
 			return;
 		}
 
