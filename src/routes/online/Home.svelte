@@ -5,6 +5,19 @@
 	import { UseRooms } from './UseRooms.svelte';
 	import { m } from '$lib/paraglide/messages';
 
+	// Modal IDs
+	const CREATE_ROOM_MODAL_ID = 'create_room_modal';
+	const PASSWORD_MODAL_ID = 'password_modal';
+
+	// Modal utility functions
+	function openModal(modalId: string) {
+		(document.getElementById(modalId) as HTMLDialogElement)?.showModal();
+	}
+
+	function closeModal(modalId: string) {
+		(document.getElementById(modalId) as HTMLDialogElement)?.close();
+	}
+
 	let {
 		conn,
 		you
@@ -22,7 +35,6 @@
 	let nameUpdating = $state(false);
 	let nameEditing = $state(false);
 	let creatingRoom = $state(false);
-	let showCreateRoomModal = $state(false);
 
 	const useRooms = new UseRooms(conn);
 	export function stopUseRooms() {
@@ -35,7 +47,6 @@
 		conn.reducers.removeOnSetName(onSetName);
 	};
 
-	let showPasswordModal = $state(false);
 	let roomToJoin = $state<Room | null>(null);
 	let passwordError = $state('');
 	let joiningWithPassword = $state(false);
@@ -55,16 +66,24 @@
 		nameUpdating = true;
 	}
 
-	const onCreateRoom: (ctx: ReducerEventContext, title: string, password: string | undefined) => void = (ctx) => {
+	const onCreateRoom: (
+		ctx: ReducerEventContext,
+		title: string,
+		password: string | undefined
+	) => void = (ctx) => {
 		if (ctx.event.status.tag === 'Failed') {
 			console.error('Failed to create room:', ctx.event.status.value);
 		}
 		creatingRoom = false;
-		showCreateRoomModal = false;
+		closeModal(CREATE_ROOM_MODAL_ID);
 		conn.reducers.removeOnCreateRoom(onCreateRoom);
 	};
 
-	const onJoinToRoom: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void = (ctx) => {
+	const onJoinToRoom: (
+		ctx: ReducerEventContext,
+		roomId: number,
+		password: string | undefined
+	) => void = (ctx) => {
 		joiningWithPassword = false;
 		if (ctx.event.status.tag === 'Failed') {
 			const errorMessage = ctx.event.status.value;
@@ -89,25 +108,25 @@
 		const formData = new FormData(event.currentTarget as HTMLFormElement);
 		const title = (formData.get('title') as string)?.trim() || (you.name ?? '???');
 		const password = (formData.get('password') as string)?.trim() || undefined;
-		
+
 		creatingRoom = true;
 		conn.reducers.createRoom(title, password);
 		conn.reducers.onCreateRoom(onCreateRoom);
 	}
 
 	function openCreateRoomModal() {
-		showCreateRoomModal = true;
+		openModal(CREATE_ROOM_MODAL_ID);
 	}
 
 	function cancelCreateRoom() {
-		showCreateRoomModal = false;
+		closeModal(CREATE_ROOM_MODAL_ID);
 	}
 
 	function joinRoom(room: Room) {
 		if (room.hasPassword) {
 			// Show password prompt modal
-			showPasswordModal = true;
 			roomToJoin = room;
+			openModal(PASSWORD_MODAL_ID);
 		} else {
 			roomToJoin = room;
 			conn.reducers.onJoinToRoom(onJoinToRoom);
@@ -118,10 +137,10 @@
 	function joinRoomWithPassword(event: SubmitEvent) {
 		event.preventDefault();
 		if (!roomToJoin) return;
-		
+
 		const password = passwordInput.trim();
 		if (!password) return;
-		
+
 		passwordError = '';
 		joiningWithPassword = true;
 		conn.reducers.onJoinToRoom(onJoinToRoom);
@@ -129,15 +148,15 @@
 	}
 
 	function cancelPasswordJoin() {
-		showPasswordModal = false;
+		closeModal(PASSWORD_MODAL_ID);
 		passwordError = '';
 		roomToJoin = null;
 		joiningWithPassword = false;
 		passwordInput = '';
 	}
-	
+
 	function resetPasswordModal() {
-		showPasswordModal = false;
+		closeModal(PASSWORD_MODAL_ID);
 		passwordError = '';
 		roomToJoin = null;
 		joiningWithPassword = false;
@@ -191,11 +210,7 @@
 	{#if you.name}
 		<div class="space-y-4">
 			<div>
-				<button 
-					type="button" 
-					class="btn btn-primary" 
-					onclick={openCreateRoomModal}
-				>
+				<button type="button" class="btn btn-primary" onclick={openCreateRoomModal}>
 					{m.great_suave_dolphin_achieve()}
 				</button>
 			</div>
@@ -209,10 +224,7 @@
 				<ol class="space-y-1">
 					{#each useRooms.rooms as room (room.id)}
 						<li class="">
-							<button
-								class="btn btn-sm"
-								onclick={() => joinRoom(room)}
-							>
+							<button class="btn btn-sm" onclick={() => joinRoom(room)}>
 								{room.title}
 								{#if room.hasPassword}
 									<span class="text-xs">🔒</span>
@@ -227,126 +239,134 @@
 </div>
 
 <!-- Create Room Modal -->
-{#if showCreateRoomModal}
-	<dialog class="modal modal-open">
-		<div class="modal-box max-w-md text-left space-y-6">
-			<!-- Header -->
-				<div class="text-center">
-					<h3 class="font-bold text-xl text-base-content">{m.great_suave_dolphin_achieve()}</h3>
-					<p class="text-sm text-base-content/70">{m.create_room_description()}</p>
-				</div>
+<dialog id={CREATE_ROOM_MODAL_ID} class="modal">
+	<div class="modal-box max-w-md space-y-6 text-left">
+		<!-- Header -->
+		<div class="text-center">
+			<h3 class="text-base-content text-xl font-bold">{m.great_suave_dolphin_achieve()}</h3>
+			<p class="text-base-content/70 text-sm">{m.create_room_description()}</p>
+		</div>
 
-			<form
-				onsubmit={createRoom}
-				class="space-y-4"
-			>
-				<!-- Room Name Field -->
-				<div>
-					<label class="label" for="room-title">
-						<span class="font-medium text-base-content">{m.room_name()}</span>
-					</label>
+		<form onsubmit={createRoom} class="space-y-4">
+			<!-- Room Name Field -->
+			<div>
+				<label class="label" for="room-title">
+					<span class="text-base-content font-medium">{m.room_name()}</span>
+				</label>
+				<input
+					id="room-title"
+					type="text"
+					name="title"
+					placeholder={you.name ?? '???'}
+					class="input input-bordered focus:input-primary w-full transition-colors"
+					disabled={creatingRoom}
+				/>
+				<div class="label">
+					<span class="text-base-content/60 text-sm">{m.room_name_hint()}</span>
+				</div>
+			</div>
+
+			<!-- Password Field -->
+			<div>
+				<label class="label" for="room-password">
+					<span class="text-base-content font-medium">{m.room_password_label()}</span>
+				</label>
+				<div class="relative">
 					<input
-						id="room-title"
-						type="text"
-						name="title"
-						placeholder={you.name ?? '???'}
-						class="input input-bordered w-full focus:input-primary transition-colors"
+						id="room-password"
+						type="password"
+						name="password"
+						placeholder={m.room_password_placeholder()}
+						class="input input-bordered focus:input-primary w-full pr-10 transition-colors"
 						disabled={creatingRoom}
 					/>
-					<div class="label">
-						<span class="text-base-content/60 text-sm">{m.room_name_hint()}</span>
+					<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+						<svg
+							class="text-base-content/40 h-4 w-4"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+							></path>
+						</svg>
 					</div>
 				</div>
-				
-				<!-- Password Field -->
-				<div>
-					<label class="label" for="room-password">
-						<span class="font-medium text-base-content">{m.room_password_label()}</span>
-					</label>
-					<div class="relative">
-						<input
-							id="room-password"
-							type="password"
-							name="password"
-							placeholder={m.room_password_placeholder()}
-							class="input input-bordered w-full focus:input-primary transition-colors pr-10"
-							disabled={creatingRoom}
-						/>
-						<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-							<svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-							</svg>
-						</div>
-					</div>
-					<div class="label">
-						<span class="text-base-content/60 text-sm">{m.room_password_hint()}</span>
-					</div>
+				<div class="label">
+					<span class="text-base-content/60 text-sm">{m.room_password_hint()}</span>
 				</div>
-				
-				<!-- Action Buttons -->
-				<div class="modal-action pt-4">
-					<button 
-						type="button" 
-						class="btn btn-ghost" 
-						onclick={cancelCreateRoom} 
-						disabled={creatingRoom}
-					>
-						{m.cancel()}
-					</button>
-					<button 
-						type="submit" 
-						class="btn btn-primary min-w-[120px]" 
-						disabled={creatingRoom}
-					>
-						{#if creatingRoom}
-							<span class="loading loading-spinner loading-sm"></span>
-							{m.creating()}
-						{:else}
-							{m.great_suave_dolphin_achieve()}
-						{/if}
-					</button>
-				</div>
-			</form>
-		</div>
-		<form method="dialog" class="modal-backdrop">
-			<button onclick={cancelCreateRoom}>close</button>
+			</div>
+
+			<!-- Action Buttons -->
+			<div class="modal-action pt-4">
+				<button
+					type="button"
+					class="btn btn-ghost"
+					onclick={cancelCreateRoom}
+					disabled={creatingRoom}
+				>
+					{m.cancel()}
+				</button>
+				<button type="submit" class="btn btn-primary min-w-[120px]" disabled={creatingRoom}>
+					{#if creatingRoom}
+						<span class="loading loading-spinner loading-sm"></span>
+						{m.creating()}
+					{:else}
+						{m.great_suave_dolphin_achieve()}
+					{/if}
+				</button>
+			</div>
 		</form>
-	</dialog>
-{/if}
+	</div>
+	<form method="dialog" class="modal-backdrop">
+		<button onclick={cancelCreateRoom}>close</button>
+	</form>
+</dialog>
 
 <!-- Password Modal -->
-{#if showPasswordModal && roomToJoin}
-	<dialog class="modal modal-open">
-		<div class="modal-box">
-			<h3 class="font-bold text-lg">{m.enter_room_password()}</h3>
-			<p class="py-4">{m.room_requires_password({ title: roomToJoin.title })}</p>
-			<form
-				onsubmit={joinRoomWithPassword}
-				class="space-y-4"
-			>
-				<input
-					type="password"
-					name="password"
-					placeholder={m.enter_password_placeholder()}
-					class="input input-bordered w-full {passwordError ? 'input-error' : ''}"
-					disabled={joiningWithPassword}
-					bind:value={passwordInput}
-				/>
-				{#if passwordError}
-					<p class="text-error text-sm">{passwordError}</p>
-				{/if}
-				<div class="modal-action">
-					<button type="button" class="btn" onclick={cancelPasswordJoin} disabled={joiningWithPassword}>{m.cancel()}</button>
-					<button type="submit" class="btn btn-primary" disabled={joiningWithPassword || !passwordInput.trim()}>
-						{#if joiningWithPassword}
-							<span class="loading loading-spinner loading-sm"></span>
-							{m.joining()}
-						{:else}
-							{m.join_room()}
-						{/if}
-					</button>
-				</div>
-			</form>
-		</div>
-	</dialog>
-{/if}
+<dialog id={PASSWORD_MODAL_ID} class="modal">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">{m.enter_room_password()}</h3>
+		<p class="py-4">{m.room_requires_password({ title: roomToJoin?.title ?? '' })}</p>
+		<form onsubmit={joinRoomWithPassword} class="space-y-4">
+			<input
+				type="password"
+				name="password"
+				placeholder={m.enter_password_placeholder()}
+				class="input input-bordered w-full {passwordError ? 'input-error' : ''}"
+				disabled={joiningWithPassword}
+				bind:value={passwordInput}
+			/>
+			{#if passwordError}
+				<p class="text-error text-sm">{passwordError}</p>
+			{/if}
+			<div class="modal-action">
+				<button
+					type="button"
+					class="btn"
+					onclick={cancelPasswordJoin}
+					disabled={joiningWithPassword}>{m.cancel()}</button
+				>
+				<button
+					type="submit"
+					class="btn btn-primary"
+					disabled={joiningWithPassword || !passwordInput.trim()}
+				>
+					{#if joiningWithPassword}
+						<span class="loading loading-spinner loading-sm"></span>
+						{m.joining()}
+					{:else}
+						{m.join_room()}
+					{/if}
+				</button>
+			</div>
+		</form>
+	</div>
+	<form method="dialog" class="modal-backdrop">
+		<button onclick={cancelPasswordJoin}>close</button>
+	</form>
+</dialog>
