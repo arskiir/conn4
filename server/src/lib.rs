@@ -218,6 +218,7 @@ pub struct Room {
     #[unique]
     owner: Identity,
     created_at: Timestamp,
+    has_password: bool,
 }
 enum DeleteRoomBy {
     RoomId(u32),
@@ -232,6 +233,26 @@ fn delete_room(ctx: &ReducerContext, by: DeleteRoomBy) {
             delete_game(ctx, DeleteGameBy::RoomId(room_id));
             delete_message(ctx, DeleteMessageBy::RoomId(room_id));
             delete_join_room(ctx, DeleteJoinRoomBy::RoomId(room_id));
+            delete_room_password(ctx, DeleteRoomPasswordBy::RoomId(room_id));
+        }
+    }
+}
+
+#[table(name = room_password)]
+pub struct RoomPassword {
+    #[primary_key]
+    room_id: u32,
+    password: String,
+}
+
+enum DeleteRoomPasswordBy {
+    RoomId(u32),
+}
+
+fn delete_room_password(ctx: &ReducerContext, by: DeleteRoomPasswordBy) {
+    match by {
+        DeleteRoomPasswordBy::RoomId(room_id) => {
+            ctx.db.room_password().room_id().delete(room_id);
         }
     }
 }
@@ -759,9 +780,24 @@ fn validate_room_title(title: &str) -> Result<(), String> {
     }
 }
 
+fn validate_room_password(password: &str) -> Result<(), String> {
+    if password.is_empty() {
+        Err("Room password must not be empty".to_string())
+    } else {
+        Ok(())
+    }
+}
+
 #[reducer]
-pub fn create_room(ctx: &ReducerContext, title: String) -> Result<(), String> {
+pub fn create_room(
+    ctx: &ReducerContext,
+    title: String,
+    password: Option<String>,
+) -> Result<(), String> {
     validate_room_title(&title)?;
+    if let Some(ref pwd) = password {
+        validate_room_password(pwd)?;
+    }
     let player = ctx
         .db
         .player()
@@ -776,8 +812,18 @@ pub fn create_room(ctx: &ReducerContext, title: String) -> Result<(), String> {
         title,
         created_at: ctx.timestamp,
         owner: ctx.sender,
+        has_password: password.is_some(),
     })?;
-    join_to_room(ctx, room.id)
+
+    // Store password in separate table if provided
+    if let Some(pwd) = password.clone() {
+        ctx.db.room_password().try_insert(RoomPassword {
+            room_id: room.id,
+            password: pwd,
+        })?;
+    }
+
+    join_to_room(ctx, room.id, password)
 }
 
 fn rejoin_previous_team(ctx: &ReducerContext, room_id: u32) -> Result<(), String> {
@@ -820,13 +866,29 @@ fn rejoin_previous_team(ctx: &ReducerContext, room_id: u32) -> Result<(), String
 }
 
 #[reducer]
-pub fn join_to_room(ctx: &ReducerContext, room_id: u32) -> Result<(), String> {
+pub fn join_to_room(
+    ctx: &ReducerContext,
+    room_id: u32,
+    password: Option<String>,
+) -> Result<(), String> {
     if ctx.db.join_room().joiner().find(&ctx.sender).is_some() {
         Err("Cannot join to a room when already in one".to_string())
     } else {
-        if ctx.db.room().id().find(room_id).is_none() {
-            return Err("Room does not exist".to_string());
+        let _room = ctx
+            .db
+            .room()
+            .id()
+            .find(room_id)
+            .ok_or("Room does not exist".to_string())?;
+
+        // Check password if room is password protected
+        if let Some(room_password_entry) = ctx.db.room_password().room_id().find(room_id) {
+            let provided_password = password.ok_or("Room requires a password".to_string())?;
+            if provided_password != room_password_entry.password {
+                return Err("Incorrect password".to_string());
+            }
         }
+
         let player = ctx
             .db
             .player()

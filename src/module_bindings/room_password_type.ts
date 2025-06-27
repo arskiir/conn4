@@ -32,38 +32,32 @@ import {
   type ReducerEventContextInterface,
   type SubscriptionEventContextInterface,
 } from "@clockworklabs/spacetimedb-sdk";
-export type Room = {
-  id: number,
-  title: string,
-  owner: Identity,
-  createdAt: Timestamp,
-  hasPassword: boolean,
+export type RoomPassword = {
+  roomId: number,
+  password: string,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace Room {
+export namespace RoomPassword {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("id", AlgebraicType.createU32Type()),
-      new ProductTypeElement("title", AlgebraicType.createStringType()),
-      new ProductTypeElement("owner", AlgebraicType.createIdentityType()),
-      new ProductTypeElement("createdAt", AlgebraicType.createTimestampType()),
-      new ProductTypeElement("hasPassword", AlgebraicType.createBoolType()),
+      new ProductTypeElement("roomId", AlgebraicType.createU32Type()),
+      new ProductTypeElement("password", AlgebraicType.createStringType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: Room): void {
-    Room.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: RoomPassword): void {
+    RoomPassword.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): Room {
-    return Room.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): RoomPassword {
+    return RoomPassword.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

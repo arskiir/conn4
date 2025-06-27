@@ -35,6 +35,7 @@ import {
 
 export type JoinToRoom = {
   roomId: number,
+  password: string | undefined,
 };
 
 /**
@@ -48,6 +49,7 @@ export namespace JoinToRoom {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("roomId", AlgebraicType.createU32Type()),
+      new ProductTypeElement("password", AlgebraicType.createOptionType(AlgebraicType.createStringType())),
     ]);
   }
 

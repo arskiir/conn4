@@ -35,6 +35,7 @@ import {
 
 export type CreateRoom = {
   title: string,
+  password: string | undefined,
 };
 
 /**
@@ -48,6 +49,7 @@ export namespace CreateRoom {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("title", AlgebraicType.createStringType()),
+      new ProductTypeElement("password", AlgebraicType.createOptionType(AlgebraicType.createStringType())),
     ]);
   }
 

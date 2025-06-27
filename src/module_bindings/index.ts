@@ -90,6 +90,8 @@ import { PlayerTableHandle } from "./player_table.ts";
 export { PlayerTableHandle };
 import { RoomTableHandle } from "./room_table.ts";
 export { RoomTableHandle };
+import { RoomPasswordTableHandle } from "./room_password_table.ts";
+export { RoomPasswordTableHandle };
 import { StatsOneMonthTableHandle } from "./stats_one_month_table.ts";
 export { StatsOneMonthTableHandle };
 import { TeamTableHandle } from "./team_table.ts";
@@ -122,6 +124,8 @@ import { Player } from "./player_type.ts";
 export { Player };
 import { Room } from "./room_type.ts";
 export { Room };
+import { RoomPassword } from "./room_password_type.ts";
+export { RoomPassword };
 import { StatsOneMonth } from "./stats_one_month_type.ts";
 export { StatsOneMonth };
 import { Team } from "./team_type.ts";
@@ -223,6 +227,15 @@ const REMOTE_MODULE = {
       primaryKeyInfo: {
         colName: "id",
         colType: Room.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
+      },
+    },
+    room_password: {
+      tableName: "room_password",
+      rowType: RoomPassword.getTypeScriptAlgebraicType(),
+      primaryKey: "roomId",
+      primaryKeyInfo: {
+        colName: "roomId",
+        colType: RoomPassword.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
       },
     },
     stats_one_month: {
@@ -404,19 +417,19 @@ export class RemoteReducers {
     this.connection.offReducer("create_game", callback);
   }
 
-  createRoom(title: string) {
-    const __args = { title };
+  createRoom(title: string, password: string | undefined) {
+    const __args = { title, password };
     let __writer = new BinaryWriter(1024);
     CreateRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("create_room", __argsBuffer, this.setCallReducerFlags.createRoomFlags);
   }
 
-  onCreateRoom(callback: (ctx: ReducerEventContext, title: string) => void) {
+  onCreateRoom(callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void) {
     this.connection.onReducer("create_room", callback);
   }
 
-  removeOnCreateRoom(callback: (ctx: ReducerEventContext, title: string) => void) {
+  removeOnCreateRoom(callback: (ctx: ReducerEventContext, title: string, password: string | undefined) => void) {
     this.connection.offReducer("create_room", callback);
   }
 
@@ -480,19 +493,19 @@ export class RemoteReducers {
     this.connection.offReducer("identity_disconnected", callback);
   }
 
-  joinToRoom(roomId: number) {
-    const __args = { roomId };
+  joinToRoom(roomId: number, password: string | undefined) {
+    const __args = { roomId, password };
     let __writer = new BinaryWriter(1024);
     JoinToRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("join_to_room", __argsBuffer, this.setCallReducerFlags.joinToRoomFlags);
   }
 
-  onJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number) => void) {
+  onJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void) {
     this.connection.onReducer("join_to_room", callback);
   }
 
-  removeOnJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number) => void) {
+  removeOnJoinToRoom(callback: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void) {
     this.connection.offReducer("join_to_room", callback);
   }
 
@@ -700,6 +713,10 @@ export class RemoteTables {
 
   get room(): RoomTableHandle {
     return new RoomTableHandle(this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room));
+  }
+
+  get roomPassword(): RoomPasswordTableHandle {
+    return new RoomPasswordTableHandle(this.connection.clientCache.getOrCreateTable<RoomPassword>(REMOTE_MODULE.tables.room_password));
   }
 
   get statsOneMonth(): StatsOneMonthTableHandle {

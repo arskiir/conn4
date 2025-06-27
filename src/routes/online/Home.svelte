@@ -34,7 +34,10 @@
 		conn.reducers.removeOnSetName(onSetName);
 	};
 
-	let joiningRoomTitle = $state('');
+	let showPasswordModal = $state(false);
+	let roomToJoin = $state<Room | null>(null);
+	let passwordError = $state('');
+	let joiningWithPassword = $state(false);
 
 	function onNameSubmit(
 		e: SubmitEvent & {
@@ -50,7 +53,7 @@
 		nameUpdating = true;
 	}
 
-	const onCreateRoom: (ctx: ReducerEventContext, title: string) => void = (ctx) => {
+	const onCreateRoom: (ctx: ReducerEventContext, title: string, password: string | undefined) => void = (ctx) => {
 		if (ctx.event.status.tag === 'Failed') {
 			console.error('Failed to create room:', ctx.event.status.value);
 		}
@@ -58,20 +61,81 @@
 		conn.reducers.removeOnCreateRoom(onCreateRoom);
 	};
 
-	function createRoom() {
+	const onJoinToRoom: (ctx: ReducerEventContext, roomId: number, password: string | undefined) => void = (ctx) => {
+		joiningWithPassword = false;
+		if (ctx.event.status.tag === 'Failed') {
+			const errorMessage = ctx.event.status.value;
+			if (errorMessage.includes('Incorrect password')) {
+				// Show error in password modal
+				passwordError = m.incorrect_password();
+			} else {
+				// Other errors - show in console and close modal
+				passwordError = errorMessage;
+				console.error('Failed to join room:', errorMessage);
+				resetPasswordModal();
+			}
+		} else {
+			// Successfully joined room
+			resetPasswordModal();
+		}
+		conn.reducers.removeOnJoinToRoom(onJoinToRoom);
+	};
+
+	function createRoom(event: SubmitEvent) {
+		event.preventDefault();
+		const formData = new FormData(event.currentTarget as HTMLFormElement);
+		const title = (formData.get('title') as string)?.trim() || (you.name ?? '???');
+		const password = (formData.get('password') as string)?.trim() || undefined;
+		
 		creatingRoom = true;
-		conn.reducers.createRoom(joiningRoomTitle.trim() || (you.name ?? '???'));
+		conn.reducers.createRoom(title, password);
 		conn.reducers.onCreateRoom(onCreateRoom);
 	}
 
 	function joinRoom(room: Room) {
-		joiningRoomTitle = room.title;
-		conn.reducers.joinToRoom(room.id);
+		if (room.hasPassword) {
+			// Show password prompt modal
+			showPasswordModal = true;
+			roomToJoin = room;
+		} else {
+			roomToJoin = room;
+			conn.reducers.onJoinToRoom(onJoinToRoom);
+			conn.reducers.joinToRoom(room.id, undefined);
+		}
+	}
+
+	function joinRoomWithPassword(event: SubmitEvent) {
+		event.preventDefault();
+		if (!roomToJoin) return;
+		
+		const formData = new FormData(event.currentTarget as HTMLFormElement);
+		const password = (formData.get('password') as string)?.trim();
+		if (!password) return;
+		
+		passwordError = '';
+		joiningWithPassword = true;
+		conn.reducers.onJoinToRoom(onJoinToRoom);
+		conn.reducers.joinToRoom(roomToJoin.id, password);
+	}
+
+	function cancelPasswordJoin() {
+		showPasswordModal = false;
+		passwordError = '';
+		roomToJoin = null;
+		joiningWithPassword = false;
+	}
+	
+	function resetPasswordModal() {
+		showPasswordModal = false;
+		passwordError = '';
+		roomToJoin = null;
+		joiningWithPassword = false;
 	}
 
 	onDestroy(async () => {
 		conn.reducers.removeOnSetName(onSetName);
 		conn.reducers.removeOnCreateRoom(onCreateRoom);
+		conn.reducers.removeOnJoinToRoom(onJoinToRoom);
 	});
 </script>
 
@@ -116,10 +180,7 @@
 		<div class="space-y-4">
 			<div>
 				<form
-					onsubmit={(e) => {
-						e.preventDefault();
-						createRoom();
-					}}
+					onsubmit={createRoom}
 					class="dropdown dropdown-hover dropdown-center"
 				>
 					<button type="submit" class="btn btn-primary" disabled={creatingRoom}
@@ -130,14 +191,19 @@
 					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 					<div
 						tabindex="0"
-						class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+						class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm space-y-2"
 					>
 						<input
 							type="text"
 							name="title"
 							placeholder={m.room_name()}
 							class="input input-bordered w-full max-w-xs"
-							bind:value={joiningRoomTitle}
+						/>
+						<input
+							type="password"
+							name="password"
+							placeholder={m.password_optional()}
+							class="input input-bordered w-full max-w-xs"
 						/>
 					</div>
 				</form>
@@ -151,13 +217,15 @@
 				<h2>{m.actual_gray_scallop_sway()} ({useRooms.rooms.length})</h2>
 				<ol class="space-y-1">
 					{#each useRooms.rooms as room (room.id)}
-						<li>
+						<li class="">
 							<button
 								class="btn btn-sm"
 								onclick={() => joinRoom(room)}
-								disabled={!!joiningRoomTitle}
 							>
 								{room.title}
+								{#if room.hasPassword}
+									<span class="text-xs">🔒</span>
+								{/if}
 							</button>
 						</li>
 					{/each}
@@ -166,3 +234,39 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Password Modal -->
+{#if showPasswordModal && roomToJoin}
+	<dialog class="modal modal-open">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">{m.enter_room_password()}</h3>
+			<p class="py-4">{m.room_requires_password({ title: roomToJoin.title })}</p>
+			<form
+				onsubmit={joinRoomWithPassword}
+				class="space-y-4"
+			>
+				<input
+					type="password"
+					name="password"
+					placeholder={m.enter_password_placeholder()}
+					class="input input-bordered w-full {passwordError ? 'input-error' : ''}"
+					disabled={joiningWithPassword}
+				/>
+				{#if passwordError}
+					<p class="text-error text-sm">{passwordError}</p>
+				{/if}
+				<div class="modal-action">
+					<button type="button" class="btn" onclick={cancelPasswordJoin} disabled={joiningWithPassword}>{m.cancel()}</button>
+					<button type="submit" class="btn btn-primary" disabled={joiningWithPassword}>
+						{#if joiningWithPassword}
+							<span class="loading loading-spinner loading-sm"></span>
+							{m.joining()}
+						{:else}
+							{m.join_room()}
+						{/if}
+					</button>
+				</div>
+			</form>
+		</div>
+	</dialog>
+{/if}
