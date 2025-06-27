@@ -106,7 +106,7 @@
 	function createRoom(event: SubmitEvent) {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget as HTMLFormElement);
-		const title = (formData.get('title') as string)?.trim() || (you.name ?? '???');
+		const title = (formData.get('title') as string)?.trim() || (you.name ?? m.unknown_user());
 		const password = (formData.get('password') as string)?.trim() || undefined;
 
 		creatingRoom = true;
@@ -257,7 +257,7 @@
 					id="room-title"
 					type="text"
 					name="title"
-					placeholder={you.name ?? '???'}
+					placeholder={you.name ?? m.unknown_user()}
 					class="input input-bordered focus:input-primary w-full transition-colors"
 					disabled={creatingRoom}
 				/>
@@ -323,7 +323,7 @@
 		</form>
 	</div>
 	<form method="dialog" class="modal-backdrop">
-		<button onclick={cancelCreateRoom}>close</button>
+		<button onclick={cancelCreateRoom}>{m.close()}</button>
 	</form>
 </dialog>
 
@@ -367,6 +367,6 @@
 		</form>
 	</div>
 	<form method="dialog" class="modal-backdrop">
-		<button onclick={cancelPasswordJoin}>close</button>
+		<button onclick={cancelPasswordJoin}>{m.close()}</button>
 	</form>
 </dialog>
