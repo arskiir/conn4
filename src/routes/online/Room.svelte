@@ -340,12 +340,13 @@
 			class="flex gap-2"
 			onsubmit={async (e) => {
 				e.preventDefault();
-				const text = new FormData(e.currentTarget).get('text') as string;
+				const form = e.currentTarget;
+				const text = new FormData(form).get('text') as string;
 				if (!text) {
 					return;
 				}
 				await useMessages.sendMessage(text);
-				e.currentTarget.reset();
+				form.reset();
 			}}
 		>
 			<input
