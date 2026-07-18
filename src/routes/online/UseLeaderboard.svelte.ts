@@ -46,7 +46,9 @@ export class UseLeaderboard {
 			return;
 		}
 
-		const idx = this.oneMonth.data.findIndex((r) => r.player.__identity__ === oldRow.player.__identity__);
+		const idx = this.oneMonth.data.findIndex(
+			(r) => r.player.__identity__ === oldRow.player.__identity__
+		);
 		if (idx !== -1) {
 			this.oneMonth.data[idx] = { ...newRow, winRate: newRow.wins / newRow.total };
 		} else {
@@ -63,7 +65,9 @@ export class UseLeaderboard {
 			console.error('One month stats not set yet');
 			return;
 		}
-		const idx = this.oneMonth.data.findIndex((r) => r.player.__identity__ === row.player.__identity__);
+		const idx = this.oneMonth.data.findIndex(
+			(r) => r.player.__identity__ === row.player.__identity__
+		);
 		if (idx === -1) {
 			console.error('Delete for non-existing row??', row);
 			return;

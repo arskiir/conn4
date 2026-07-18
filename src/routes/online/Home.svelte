@@ -168,7 +168,6 @@
 		joiningWithPassword = false;
 		passwordInput = '';
 	}
-
 </script>
 
 {#snippet nameInputForm()}

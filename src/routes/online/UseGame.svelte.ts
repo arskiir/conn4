@@ -58,7 +58,9 @@ export class UseGame {
 	/**
 	 * Not `undefined` if you are one of the joiners of the game.
 	 */
-	yourJoinTeam = $derived(this._joinTeams.find((jt) => jt.joiner.__identity__ === this.yourIdentity.__identity__));
+	yourJoinTeam = $derived(
+		this._joinTeams.find((jt) => jt.joiner.__identity__ === this.yourIdentity.__identity__)
+	);
 
 	private _gameJoining = $state(false);
 	get gameJoining() {
@@ -191,7 +193,9 @@ export class UseGame {
 					throw new Error('You have not joined to the game.');
 				}
 			}
-			const deleted = this._joinTeams.findIndex((j) => j.joiner.__identity__ === jt.joiner.__identity__);
+			const deleted = this._joinTeams.findIndex(
+				(j) => j.joiner.__identity__ === jt.joiner.__identity__
+			);
 			if (deleted !== -1) {
 				this._joinTeams.splice(deleted, 1);
 			}
