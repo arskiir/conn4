@@ -5,6 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
+		"dev:all": "npm run db & npm run dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"bp": "vite build && vite preview",
