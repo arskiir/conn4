@@ -409,7 +409,7 @@
 					<!-- <div class="chat-footer opacity-50">Delivered</div> -->
 				</div>
 			{:else}
-				<p class="opacity-75 text-sm md:text-base text-center">{m.no_messages()}</p>
+				<p class="text-center text-sm opacity-75 md:text-base">{m.no_messages()}</p>
 			{/each}
 		</ol>
 	</div>

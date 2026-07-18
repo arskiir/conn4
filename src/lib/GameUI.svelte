@@ -110,7 +110,7 @@
 		{/each}
 	</div>
 
-	<div class="scrollbar-thin w-screen overflow-x-auto text-center" bind:this={scrollContainer}>
+	<div class="w-screen scrollbar-thin overflow-x-auto text-center" bind:this={scrollContainer}>
 		<div in:slide class="inline-block">
 			{#each props.table as row, i (i)}
 				<div class="flex justify-center">

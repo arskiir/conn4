@@ -15,4 +15,18 @@ Object.defineProperty(window, 'matchMedia', {
 	}))
 });
 
-// add more mocks here if you need them
+// jsdom does not implement Web Animations API (used by Svelte transitions)
+Element.prototype.animate ??= function () {
+	return {
+		finished: Promise.resolve(),
+		cancel: vi.fn(),
+		finish: vi.fn(),
+		play: vi.fn(),
+		pause: vi.fn(),
+		reverse: vi.fn(),
+		updatePlaybackRate: vi.fn(),
+		addEventListener: vi.fn(),
+		removeEventListener: vi.fn(),
+		dispatchEvent: vi.fn()
+	} as unknown as Animation;
+};

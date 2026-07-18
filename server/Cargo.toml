@@ -11,4 +11,4 @@ crate-type = ["cdylib"]
 [dependencies]
 spacetimedb = { version = "2.6.1", features = ["unstable"] }
 log = "0.4"
-unicode-segmentation = "1.12.0"
+unicode-segmentation = "1.13.3"

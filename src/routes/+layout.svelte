@@ -29,7 +29,7 @@
 </script>
 
 <div
-	class="scrollbar-track-transparent scrollbar-thumb-white flex min-h-screen flex-col items-center justify-center gap-2"
+	class="flex min-h-screen scrollbar-thumb-white scrollbar-track-transparent flex-col items-center justify-center gap-2"
 >
 	<div class="navbar bg-base-100">
 		<div class="navbar-start">

@@ -3,9 +3,10 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import Page from './+page.svelte';
 
-describe('/+page.svelte', () => {
-	test('should render h1', () => {
+describe('/offline/+page.svelte', () => {
+	test('should render both players', () => {
 		render(Page);
-		expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+		expect(screen.getByText('Player 1')).toBeInTheDocument();
+		expect(screen.getByText('Player 2')).toBeInTheDocument();
 	});
 });
