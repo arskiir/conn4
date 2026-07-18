@@ -1,14 +1,13 @@
 import { SubscriptionHandle } from '$lib';
-import { Identity } from '@clockworklabs/spacetimedb-sdk';
-import {
-	type DbConnection,
-	type EventContext,
-	type Game,
-	type GameCurrentTeam,
-	type HasDroppedPieceToGame,
-	type JoinTeam,
-	type ReducerEventContext,
-	type Team
+import type { Identity } from 'spacetimedb';
+import type {
+	DbConnection,
+	EventContext,
+	Game,
+	GameCurrentTeam,
+	HasDroppedPieceToGame,
+	JoinTeam,
+	Team
 } from '../../module_bindings';
 
 export class UseGame {
@@ -59,7 +58,9 @@ export class UseGame {
 	/**
 	 * Not `undefined` if you are one of the joiners of the game.
 	 */
-	yourJoinTeam = $derived(this._joinTeams.find((jt) => jt.joiner.data === this.yourIdentity.data));
+	yourJoinTeam = $derived(
+		this._joinTeams.find((jt) => jt.joiner.__identity__ === this.yourIdentity.__identity__)
+	);
 
 	private _gameJoining = $state(false);
 	get gameJoining() {
@@ -165,10 +166,10 @@ export class UseGame {
 			.subscribe(`SELECT * FROM game WHERE room_id = '${roomId}'`);
 
 		this.joinTeamOnInsert = (ctx, jt) => {
-			if (jt.joiner.data === yourIdentity.data) {
+			if (jt.joiner.__identity__ === yourIdentity.__identity__) {
 				this._gameJoining = false;
 			}
-			let existing = this._joinTeams.find((j) => j.joiner.data === jt.joiner.data);
+			let existing = this._joinTeams.find((j) => j.joiner.__identity__ === jt.joiner.__identity__);
 			if (existing) {
 				existing = jt;
 			} else {
@@ -176,10 +177,10 @@ export class UseGame {
 			}
 		};
 		this.joinTeamOnUpdate = (ctx, _, n) => {
-			const idx = this._joinTeams.findIndex((j) => j.joiner.data === n.joiner.data);
+			const idx = this._joinTeams.findIndex((j) => j.joiner.__identity__ === n.joiner.__identity__);
 			if (idx !== -1) {
 				this._joinTeams[idx] = n;
-				if (n.joiner.data === yourIdentity.data) {
+				if (n.joiner.__identity__ === yourIdentity.__identity__) {
 					this._gameJoining = false;
 				}
 			} else {
@@ -187,26 +188,28 @@ export class UseGame {
 			}
 		};
 		this.joinTeamOnDelete = (ctx, jt) => {
-			if (jt.joiner.data === yourIdentity.data) {
+			if (jt.joiner.__identity__ === yourIdentity.__identity__) {
 				if (!this.yourJoinTeam) {
 					throw new Error('You have not joined to the game.');
 				}
 			}
-			const deleted = this._joinTeams.findIndex((j) => j.joiner.data === jt.joiner.data);
+			const deleted = this._joinTeams.findIndex(
+				(j) => j.joiner.__identity__ === jt.joiner.__identity__
+			);
 			if (deleted !== -1) {
 				this._joinTeams.splice(deleted, 1);
 			}
 		};
-		conn.db.joinTeam.onInsert(this.joinTeamOnInsert);
-		conn.db.joinTeam.onDelete(this.joinTeamOnDelete);
-		conn.db.joinTeam.onUpdate(this.joinTeamOnUpdate);
+		conn.db.join_team.onInsert(this.joinTeamOnInsert);
+		conn.db.join_team.onDelete(this.joinTeamOnDelete);
+		conn.db.join_team.onUpdate(this.joinTeamOnUpdate);
 
 		this.subscriptions++;
 		this.joinTeamHandle = conn
 			.subscriptionBuilder()
 			.onApplied(() => {
 				this.activeSubscriptions++;
-				for (const jt of conn.db.joinTeam.iter()) {
+				for (const jt of conn.db.join_team.iter()) {
 					if (jt.roomId === roomId) {
 						this._joinTeams.push(jt);
 					} else {
@@ -224,18 +227,18 @@ export class UseGame {
 		this.gameCurrentTeamOnUpdate = (ctx, _, n) => {
 			this._gameCurrentTeam = n;
 		};
-		conn.db.gameCurrentTeam.onUpdate(this.gameCurrentTeamOnUpdate);
+		conn.db.game_current_team.onUpdate(this.gameCurrentTeamOnUpdate);
 		this.gameCurrentTeamOnInsert = (ctx, gameCurrentTeam) => {
 			this._gameCurrentTeam = gameCurrentTeam;
 		};
-		conn.db.gameCurrentTeam.onInsert(this.gameCurrentTeamOnInsert);
+		conn.db.game_current_team.onInsert(this.gameCurrentTeamOnInsert);
 
 		this.subscriptions++;
 		this.gameCurrentTeamHandle = conn
 			.subscriptionBuilder()
 			.onApplied(() => {
 				this.activeSubscriptions++;
-				const currentTeam = Array.from(conn.db.gameCurrentTeam.iter())[0];
+				const currentTeam = Array.from(conn.db.game_current_team.iter())[0];
 				if (currentTeam) {
 					this._gameCurrentTeam = currentTeam;
 				}
@@ -285,18 +288,18 @@ export class UseGame {
 				this._hasDroppedPieceToGames.splice(index, 1);
 			}
 		};
-		conn.db.hasDroppedPieceToGame.onInsert(this.hasDroppedPieceToGameOnInsert);
-		conn.db.hasDroppedPieceToGame.onDelete(this.hasDroppedPieceToGameOnDelete);
+		conn.db.has_dropped_piece_to_game.onInsert(this.hasDroppedPieceToGameOnInsert);
+		conn.db.has_dropped_piece_to_game.onDelete(this.hasDroppedPieceToGameOnDelete);
 
 		this.subscriptions++;
 		this.hasDroppedPieceToGameHandle = conn
 			.subscriptionBuilder()
 			.onApplied(() => {
 				this.activeSubscriptions++;
-				for (const hasDroppedPieceToGame of conn.db.hasDroppedPieceToGame.iter()) {
+				for (const hasDroppedPieceToGame of conn.db.has_dropped_piece_to_game.iter()) {
 					if (
 						hasDroppedPieceToGame.gameId === roomId &&
-						hasDroppedPieceToGame.joiner.data === yourIdentity.data
+						hasDroppedPieceToGame.joiner.__identity__ === yourIdentity.__identity__
 					) {
 						this._hasDroppedPieceToGames.push(hasDroppedPieceToGame);
 					} else {
@@ -314,32 +317,22 @@ export class UseGame {
 			);
 	}
 
-	createGame() {
+	async createGame() {
 		this._gameJoining = true;
-		this.conn.reducers.createGame();
-		return new Promise<void>((resolve) => {
-			const onCreateGame = (ctx: ReducerEventContext) => {
-				this._gameJoining = false;
-				ctx.reducers.removeOnCreateGame(onCreateGame);
-				// see join game on insert for the rest of the logic
-				resolve();
-			};
-			this.conn.reducers.onCreateGame(onCreateGame);
-		});
+		try {
+			await this.conn.reducers.createGame({});
+		} finally {
+			this._gameJoining = false;
+		}
 	}
 
-	joinTeam(teamId: number) {
+	async joinTeam(teamId: number) {
 		this._gameJoining = true;
-		this.conn.reducers.joinToTeam(teamId);
-		return new Promise<void>((resolve) => {
-			const onJoinTeam = (ctx: ReducerEventContext) => {
-				this._gameJoining = false;
-				ctx.reducers.removeOnJoinToTeam(onJoinTeam);
-				// see join game on insert for the rest of the logic
-				resolve();
-			};
-			this.conn.reducers.onJoinToTeam(onJoinTeam);
-		});
+		try {
+			await this.conn.reducers.joinToTeam({ teamId });
+		} finally {
+			this._gameJoining = false;
+		}
 	}
 
 	private stopGame() {
@@ -364,9 +357,9 @@ export class UseGame {
 
 	private stopJoinTeam() {
 		const removeListeners = () => {
-			this.conn.db.joinTeam.removeOnInsert(this.joinTeamOnInsert);
-			this.conn.db.joinTeam.removeOnDelete(this.joinTeamOnDelete);
-			this.conn.db.joinTeam.removeOnUpdate(this.joinTeamOnUpdate);
+			this.conn.db.join_team.removeOnInsert(this.joinTeamOnInsert);
+			this.conn.db.join_team.removeOnDelete(this.joinTeamOnDelete);
+			this.conn.db.join_team.removeOnUpdate(this.joinTeamOnUpdate);
 		};
 
 		return new Promise<void>((resolve) => {
@@ -384,8 +377,8 @@ export class UseGame {
 
 	private stopGameCurrentTeam() {
 		const removeListeners = () => {
-			this.conn.db.gameCurrentTeam.removeOnUpdate(this.gameCurrentTeamOnUpdate);
-			this.conn.db.gameCurrentTeam.removeOnInsert(this.gameCurrentTeamOnInsert);
+			this.conn.db.game_current_team.removeOnUpdate(this.gameCurrentTeamOnUpdate);
+			this.conn.db.game_current_team.removeOnInsert(this.gameCurrentTeamOnInsert);
 		};
 
 		return new Promise<void>((resolve) => {
@@ -421,8 +414,8 @@ export class UseGame {
 
 	private stopHasDroppedPieceToGame() {
 		const removeListeners = () => {
-			this.conn.db.hasDroppedPieceToGame.removeOnInsert(this.hasDroppedPieceToGameOnInsert);
-			this.conn.db.hasDroppedPieceToGame.removeOnDelete(this.hasDroppedPieceToGameOnDelete);
+			this.conn.db.has_dropped_piece_to_game.removeOnInsert(this.hasDroppedPieceToGameOnInsert);
+			this.conn.db.has_dropped_piece_to_game.removeOnDelete(this.hasDroppedPieceToGameOnDelete);
 		};
 
 		return new Promise<void>((resolve) => {

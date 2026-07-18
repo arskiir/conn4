@@ -1,5 +1,5 @@
-import { SubscriptionHandle } from '$lib';
-import { DbConnection, EventContext, Message, ReducerEventContext } from '../../module_bindings';
+import type { SubscriptionHandle } from '$lib';
+import type { DbConnection, EventContext, Message } from '../../module_bindings';
 
 export class UseRoomMessages {
 	private _messages = $state<Message[]>([]);
@@ -13,15 +13,11 @@ export class UseRoomMessages {
 
 	private readonly messageOnInsert: (ctx: EventContext, msg: Message) => void;
 	private readonly messageSubHandle: SubscriptionHandle;
-	private readonly messageOnDelete: (ctx: ReducerEventContext, text: string) => void = () => {
-		this.sending = false;
-	};
 
 	constructor(
 		private readonly conn: DbConnection,
 		public readonly roomId: number
 	) {
-		this.conn.reducers.onSendMessage(this.messageOnDelete);
 		this.messageOnInsert = (ctx: EventContext, msg: Message) => {
 			let existingMessage = this._messages.find((m) => m.sentAt === msg.sentAt);
 			if (existingMessage) {
@@ -66,6 +62,10 @@ export class UseRoomMessages {
 
 	async sendMessage(text: string) {
 		this.sending = true;
-		this.conn.reducers.sendMessage(text);
+		try {
+			await this.conn.reducers.sendMessage({ text });
+		} finally {
+			this.sending = false;
+		}
 	}
 }

@@ -72,9 +72,9 @@
 			throw new Error('Connection is not set yet');
 		}
 
-		if (jr.joiner.data === you.identity.data) {
+		if (jr.joiner.__identity__ === you.identity.__identity__) {
 			yourJoinRoom = jr;
-			conn.db.joinRoom.removeOnInsert(youJoinRoomOnInsert);
+			conn.db.join_room.removeOnInsert(youJoinRoomOnInsert);
 		} else {
 			console.error('Room of another user', jr);
 		}
@@ -93,13 +93,13 @@
 						throw new Error('Connection is not set yet');
 					}
 
-					for (const jr of conn.db.joinRoom.iter()) {
-						if (jr.joiner.data === you?.identity.data) {
+					for (const jr of conn.db.join_room.iter()) {
+						if (jr.joiner.__identity__ === you?.identity.__identity__) {
 							yourJoinRoom = jr;
 							return;
 						}
 					}
-					conn.db.joinRoom.onInsert(youJoinRoomOnInsert);
+					conn.db.join_room.onInsert(youJoinRoomOnInsert);
 					resolve();
 				})
 				.onError((ctx) => {
@@ -132,7 +132,7 @@
 						throw new Error('Connection is not set yet');
 					}
 
-					conn.db.joinRoom.removeOnInsert(youJoinRoomOnInsert);
+					conn.db.join_room.removeOnInsert(youJoinRoomOnInsert);
 					yourJoinRoomHandle = null;
 					await home?.stopUseRooms();
 					s = toRoomData;

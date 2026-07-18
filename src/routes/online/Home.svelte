@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { You } from '$lib';
-	import { DbConnection, type ReducerEventContext, Room } from '../../module_bindings';
-	import { onDestroy } from 'svelte';
+	import { SenderError } from 'spacetimedb';
+	import type { DbConnection, Room } from '../../module_bindings';
 	import { UseRooms } from './UseRooms.svelte';
 	import { m } from '$lib/paraglide/messages';
 
@@ -45,18 +45,12 @@
 		return useRooms.stop();
 	}
 
-	const onSetName = () => {
-		nameUpdating = false;
-		nameEditing = false;
-		conn.reducers.removeOnSetName(onSetName);
-	};
-
 	let roomToJoin = $state<Room | null>(null);
 	let passwordError = $state('');
 	let joiningWithPassword = $state(false);
 	let passwordInput = $state('');
 
-	function onNameSubmit(
+	async function onNameSubmit(
 		e: SubmitEvent & {
 			currentTarget: EventTarget & HTMLFormElement;
 		}
@@ -65,49 +59,18 @@
 		const newName = new FormData(e.currentTarget).get('name') as string;
 		if (!newName || newName === you.name) return;
 
-		conn.reducers.onSetName(onSetName);
-		conn.reducers.setName(newName);
 		nameUpdating = true;
+		try {
+			await conn.reducers.setName({ name: newName });
+			nameEditing = false;
+		} catch (err) {
+			console.error('Failed to set name:', err);
+		} finally {
+			nameUpdating = false;
+		}
 	}
 
-	const onCreateRoom: (
-		ctx: ReducerEventContext,
-		title: string,
-		password: string | undefined
-	) => void = (ctx) => {
-		if (ctx.event.status.tag === 'Failed') {
-			console.error('Failed to create room:', ctx.event.status.value);
-		}
-		creatingRoom = false;
-		closeModal(CREATE_ROOM_MODAL_ID);
-		conn.reducers.removeOnCreateRoom(onCreateRoom);
-	};
-
-	const onJoinToRoom: (
-		ctx: ReducerEventContext,
-		roomId: number,
-		password: string | undefined
-	) => void = (ctx) => {
-		joiningWithPassword = false;
-		if (ctx.event.status.tag === 'Failed') {
-			const errorMessage = ctx.event.status.value;
-			if (errorMessage.includes('Incorrect password')) {
-				// Show error in password modal
-				passwordError = m.incorrect_password();
-			} else {
-				// Other errors - show in console and close modal
-				passwordError = errorMessage;
-				console.error('Failed to join room:', errorMessage);
-				resetPasswordModal();
-			}
-		} else {
-			// Successfully joined room
-			resetPasswordModal();
-		}
-		conn.reducers.removeOnJoinToRoom(onJoinToRoom);
-	};
-
-	function createRoom(event: SubmitEvent) {
+	async function createRoom(event: SubmitEvent) {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget as HTMLFormElement);
 		const title = (formData.get('title') as string)?.trim() || (you.name ?? m.unknown_user());
@@ -119,8 +82,14 @@
 		}
 
 		creatingRoom = true;
-		conn.reducers.createRoom(title, password);
-		conn.reducers.onCreateRoom(onCreateRoom);
+		try {
+			await conn.reducers.createRoom({ title, password });
+			closeModal(CREATE_ROOM_MODAL_ID);
+		} catch (err) {
+			console.error('Failed to create room:', err);
+		} finally {
+			creatingRoom = false;
+		}
 	}
 
 	function openCreateRoomModal() {
@@ -132,19 +101,25 @@
 		roomPassword = ''; // Reset password field
 	}
 
-	function joinRoom(room: Room) {
+	async function joinRoom(room: Room) {
 		if (room.hasPassword) {
 			// Show password prompt modal
 			roomToJoin = room;
 			openModal(PASSWORD_MODAL_ID);
-		} else {
-			roomToJoin = room;
-			conn.reducers.onJoinToRoom(onJoinToRoom);
-			conn.reducers.joinToRoom(room.id, undefined);
+			return;
+		}
+
+		roomToJoin = room;
+		try {
+			await conn.reducers.joinToRoom({ roomId: room.id, password: undefined });
+			resetPasswordModal();
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			console.error('Failed to join room:', errorMessage);
 		}
 	}
 
-	function joinRoomWithPassword(event: SubmitEvent) {
+	async function joinRoomWithPassword(event: SubmitEvent) {
 		event.preventDefault();
 		if (!roomToJoin) return;
 
@@ -159,8 +134,23 @@
 
 		passwordError = '';
 		joiningWithPassword = true;
-		conn.reducers.onJoinToRoom(onJoinToRoom);
-		conn.reducers.joinToRoom(roomToJoin.id, password);
+		try {
+			await conn.reducers.joinToRoom({ roomId: roomToJoin.id, password });
+			resetPasswordModal();
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			if (errorMessage.includes('Incorrect password') || err instanceof SenderError) {
+				passwordError = errorMessage.includes('Incorrect password')
+					? m.incorrect_password()
+					: errorMessage;
+			} else {
+				passwordError = errorMessage;
+				console.error('Failed to join room:', errorMessage);
+				resetPasswordModal();
+			}
+		} finally {
+			joiningWithPassword = false;
+		}
 	}
 
 	function cancelPasswordJoin() {
@@ -178,12 +168,6 @@
 		joiningWithPassword = false;
 		passwordInput = '';
 	}
-
-	onDestroy(async () => {
-		conn.reducers.removeOnSetName(onSetName);
-		conn.reducers.removeOnCreateRoom(onCreateRoom);
-		conn.reducers.removeOnJoinToRoom(onJoinToRoom);
-	});
 </script>
 
 {#snippet nameInputForm()}

@@ -1,4 +1,4 @@
-import type { StatsOneMonth } from './../../module_bindings/stats_one_month_type';
+import type { StatsOneMonth } from '../../module_bindings/types';
 import type { DbConnection, EventContext } from '../../module_bindings';
 import type { SubscriptionHandle } from '$lib';
 
@@ -46,7 +46,9 @@ export class UseLeaderboard {
 			return;
 		}
 
-		const idx = this.oneMonth.data.findIndex((r) => r.player.data === oldRow.player.data);
+		const idx = this.oneMonth.data.findIndex(
+			(r) => r.player.__identity__ === oldRow.player.__identity__
+		);
 		if (idx !== -1) {
 			this.oneMonth.data[idx] = { ...newRow, winRate: newRow.wins / newRow.total };
 		} else {
@@ -63,7 +65,9 @@ export class UseLeaderboard {
 			console.error('One month stats not set yet');
 			return;
 		}
-		const idx = this.oneMonth.data.findIndex((r) => r.player.data === row.player.data);
+		const idx = this.oneMonth.data.findIndex(
+			(r) => r.player.__identity__ === row.player.__identity__
+		);
 		if (idx === -1) {
 			console.error('Delete for non-existing row??', row);
 			return;
@@ -83,9 +87,9 @@ export class UseLeaderboard {
 					loading: false,
 					data: []
 				};
-				this.conn.db.statsOneMonth.onInsert(this.oneMonthOnInsert);
-				this.conn.db.statsOneMonth.onUpdate(this.oneMonthOnUpdate);
-				this.conn.db.statsOneMonth.onDelete(this.oneMonthOnDelete);
+				this.conn.db.stats_one_month.onInsert(this.oneMonthOnInsert);
+				this.conn.db.stats_one_month.onUpdate(this.oneMonthOnUpdate);
+				this.conn.db.stats_one_month.onDelete(this.oneMonthOnDelete);
 			})
 			.onError((ctx) => {
 				console.error('Error subscribing to one month stats:', ctx.event);
@@ -94,9 +98,9 @@ export class UseLeaderboard {
 	};
 
 	private readonly removeOneMonthListeners = () => {
-		this.conn.db.statsOneMonth.removeOnInsert(this.oneMonthOnInsert);
-		this.conn.db.statsOneMonth.removeOnUpdate(this.oneMonthOnUpdate);
-		this.conn.db.statsOneMonth.removeOnDelete(this.oneMonthOnDelete);
+		this.conn.db.stats_one_month.removeOnInsert(this.oneMonthOnInsert);
+		this.conn.db.stats_one_month.removeOnUpdate(this.oneMonthOnUpdate);
+		this.conn.db.stats_one_month.removeOnDelete(this.oneMonthOnDelete);
 	};
 
 	private stopOneMonth = () => {

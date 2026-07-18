@@ -12,7 +12,7 @@
 
 	let { conn, players, roomId, initialRoomTitle, you, leaveRoom }: RoomData = $props();
 
-	let joinRooms = $state<JoinRoom[]>(Array.from(conn.db.joinRoom.iter()));
+	let joinRooms = $state<JoinRoom[]>(Array.from(conn.db.join_room.iter()));
 
 	const useMessages = new UseRoomMessages(conn, roomId);
 	const useGame = new UseGame(conn, roomId, you.identity);
@@ -22,13 +22,13 @@
 		joinRooms.push(jr);
 	};
 	const joinRoomOnDelete = async (_: EventContext, jr: JoinRoom) => {
-		const index = joinRooms.findIndex((j) => j.joiner.data === jr.joiner.data);
+		const index = joinRooms.findIndex((j) => j.joiner.__identity__ === jr.joiner.__identity__);
 		if (index !== -1) {
 			joinRooms.splice(index, 1);
 		} else {
 			throw new Error(`Join room not found for deletion: ${jr.joiner}`);
 		}
-		if (jr.joiner.data === you.identity.data) {
+		if (jr.joiner.__identity__ === you.identity.__identity__) {
 			if (allJoinRoomHandle.isActive()) {
 				try {
 					allJoinRoomHandle.unsubscribe();
@@ -43,7 +43,7 @@
 		}
 	};
 	const joinRoomOnUpdate = (_: EventContext, o: JoinRoom, n: JoinRoom) => {
-		const index = joinRooms.findIndex((j) => j.joiner.data === o.joiner.data);
+		const index = joinRooms.findIndex((j) => j.joiner.__identity__ === o.joiner.__identity__);
 		if (index !== -1) {
 			joinRooms[index] = n;
 		} else {
@@ -58,19 +58,24 @@
 		})
 		.subscribe(`SELECT * FROM join_room WHERE room_id = '${roomId}'`);
 
-	conn.db.joinRoom.onInsert(joinRoomOnInsert);
-	conn.db.joinRoom.onDelete(joinRoomOnDelete);
-	conn.db.joinRoom.onUpdate(joinRoomOnUpdate);
+	conn.db.join_room.onInsert(joinRoomOnInsert);
+	conn.db.join_room.onDelete(joinRoomOnDelete);
+	conn.db.join_room.onUpdate(joinRoomOnUpdate);
 	const removeJoinRoomListeners = () => {
-		conn.db.joinRoom.removeOnInsert(joinRoomOnInsert);
-		conn.db.joinRoom.removeOnDelete(joinRoomOnDelete);
-		conn.db.joinRoom.removeOnUpdate(joinRoomOnUpdate);
+		conn.db.join_room.removeOnInsert(joinRoomOnInsert);
+		conn.db.join_room.removeOnDelete(joinRoomOnDelete);
+		conn.db.join_room.removeOnUpdate(joinRoomOnUpdate);
 	};
 
 	let leaving = $state(false);
-	const leave = () => {
+	const leave = async () => {
 		leaving = true;
-		conn.reducers.leaveRoom();
+		try {
+			await conn.reducers.leaveRoom({});
+		} catch (e) {
+			console.error('Error leaving room:', e);
+			leaving = false;
+		}
 	};
 
 	const onStartGame = async () => {
@@ -89,7 +94,7 @@
 
 		const teamHasOnlinePlayer = new Map<number, boolean>();
 		for (const jt of useGame.joinTeams) {
-			const player = players.get(jt.joiner.data);
+			const player = players.get(jt.joiner.__identity__);
 			if (!player) {
 				console.error('Player not found:', jt.joiner);
 				continue;
@@ -127,7 +132,7 @@
 				? [useGame.game.latestMove.x, useGame.game.latestMove.y]
 				: undefined,
 			players: useGame.joinTeams.map((jt) => {
-				const player = players.get(jt.joiner.data);
+				const player = players.get(jt.joiner.__identity__);
 				return {
 					id: jt.joiner.toHexString(),
 					name: player?.name ?? 'Unknown',
@@ -149,7 +154,7 @@
 					return {
 						playerId: cell.dropper.toHexString(),
 						teamId: cell.teamId,
-						playerName: players.get(cell.dropper.data)?.name
+						playerName: players.get(cell.dropper.__identity__)?.name
 					};
 				})
 			),
@@ -163,17 +168,15 @@
 		};
 	});
 
-	conn.reducers.onDropPiece((ctx) => {
-		if (ctx.event.status.tag !== 'Committed') {
-			console.error('Error dropping piece:', ctx.event.status);
+	const drop = async (col: number) => {
+		dropping = true;
+		try {
+			await conn.reducers.dropPiece({ column: col });
+			// TODO: Optimistic update of the game state.
+		} catch (e) {
+			console.error('Error dropping piece:', e);
 			dropping = false;
 		}
-		// For the happy case, `dropping` is reset when the `readyGameState` is changed.
-	});
-	const drop = (col: number) => {
-		dropping = true;
-		conn.reducers.dropPiece(col);
-		// TODO: Optimistic update of the game state.
 	};
 	$effect(() => {
 		if (readyGameState) {
@@ -188,27 +191,27 @@
 
 	let restarting = $state(false);
 
-	const restartGameHasWinner = () => {
+	const restartGameHasWinner = async () => {
 		restarting = true;
-		conn.reducers.restartGameHasWinner();
-	};
-	conn.reducers.onRestartGameHasWinner((ctx) => {
-		restarting = false;
-		if (ctx.event.status.tag !== 'Committed') {
-			console.error('Error restarting game:', ctx.event.status);
+		try {
+			await conn.reducers.restartGameHasWinner({});
+		} catch (e) {
+			console.error('Error restarting game:', e);
+		} finally {
+			restarting = false;
 		}
-	});
+	};
 
-	const restartGameFullTable = () => {
+	const restartGameFullTable = async () => {
 		restarting = true;
-		conn.reducers.restartGameTableFull();
-	};
-	conn.reducers.onRestartGameTableFull((ctx) => {
-		restarting = false;
-		if (ctx.event.status.tag !== 'Committed') {
-			console.error('Error restarting game:', ctx.event.status);
+		try {
+			await conn.reducers.restartGameTableFull({});
+		} catch (e) {
+			console.error('Error restarting game:', e);
+		} finally {
+			restarting = false;
 		}
-	});
+	};
 </script>
 
 <div class="space-y-4 lg:space-y-5">
@@ -311,13 +314,13 @@
 {#snippet playerList()}
 	<ul>
 		{#each joinRooms as jr (jr.joiner)}
-			{@const player = players.get(jr.joiner.data)}
+			{@const player = players.get(jr.joiner.__identity__)}
 			<li class="text-left">
 				{#if player}
 					<div
 						class="status transition-colors {player.online ? 'status-success' : 'status-error'}"
 					></div>
-					{#if player.identity.data === you.identity.data}
+					{#if player.identity.__identity__ === you.identity.__identity__}
 						<span class="text-sm font-bold md:text-base">{player.name} ({m.you()})</span>
 					{:else}
 						<span class="text-sm md:text-base">{player.name}</span>
@@ -360,7 +363,7 @@
 		<ol class="h-96 overflow-auto">
 			<!-- message display area -->
 			{#each useMessages.messages as msg (msg.sentAt)}
-				{@const isYours = msg.sender.data === you.identity.data}
+				{@const isYours = msg.sender.__identity__ === you.identity.__identity__}
 				<div
 					in:fly={{
 						y: -100,
@@ -372,10 +375,10 @@
 					class="chat {isYours ? 'chat-end' : 'chat-start'}"
 				>
 					<div class="chat-header">
-						{#if msg.sender.data === you.identity.data}
+						{#if msg.sender.__identity__ === you.identity.__identity__}
 							{m.you()}
-						{:else if players.has(msg.sender.data)}
-							{@const player = players.get(msg.sender.data)!}
+						{:else if players.has(msg.sender.__identity__)}
+							{@const player = players.get(msg.sender.__identity__)!}
 							<div class="flex items-center gap-1 overflow-visible">
 								{#if !player.online}
 									<div class="tooltip tooltip-right" data-tip="Offline">

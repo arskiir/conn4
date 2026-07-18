@@ -4,10 +4,13 @@ use log::info;
 use spacetimedb::{
     client_visibility_filter,
     rand::{seq::IteratorRandom, Rng},
-    reducer, table, Filter, Identity, ReducerContext, ScheduleAt, SpacetimeType, Table,
-    TimeDuration, Timestamp,
+    reducer, table, CaseConversionPolicy, Filter, Identity, ReducerContext, ScheduleAt,
+    SpacetimeType, Table, TimeDuration, Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
+
+#[spacetimedb::settings]
+const CASE_CONVERSION_POLICY: CaseConversionPolicy = CaseConversionPolicy::None;
 
 const STREAK_REQUIRED: usize = 4;
 
@@ -15,7 +18,7 @@ const ROWS: usize = 6;
 /// Must be >= `STREAK_REQUIRED`` to not cause panic when checking for a win
 const COLS: usize = 20;
 
-#[table(name = player, public)]
+#[table(accessor = player, public)]
 pub struct Player {
     #[primary_key]
     identity: Identity,
@@ -23,7 +26,7 @@ pub struct Player {
     online: bool,
 }
 
-#[table(name = join_team, public)]
+#[table(accessor = join_team, public)]
 pub struct JoinTeam {
     #[index(btree)]
     /// TODO: Since a join_team belongs to a Team, we could delete this field and refactor???
@@ -71,7 +74,7 @@ type Cell = Option<DroppedPiece>;
 
 type GameTable = Vec<Vec<Cell>>;
 
-#[table(name = team, public)]
+#[table(accessor = team, public)]
 pub struct Team {
     #[primary_key]
     #[auto_inc]
@@ -93,7 +96,7 @@ fn delete_team(ctx: &ReducerContext, by: DeleteTeamBy) {
     }
 }
 
-#[table(name = game_current_team, public)]
+#[table(accessor = game_current_team, public)]
 pub struct GameCurrentTeam {
     #[primary_key]
     game_id: u32,
@@ -113,7 +116,7 @@ fn delete_game_current_team(ctx: &ReducerContext, by: DeleteGameCurrentTeamBy) {
     }
 }
 
-#[table(name = game, public)]
+#[table(accessor = game, public)]
 pub struct Game {
     #[primary_key]
     room_id: u32,
@@ -160,7 +163,7 @@ impl Game {
     }
 }
 
-#[table(name = game_history, public)]
+#[table(accessor = game_history, public)]
 pub struct GameHistory {
     #[primary_key]
     #[auto_inc]
@@ -176,7 +179,7 @@ pub struct GameHistory {
 const GAME_HISTORY_FILTER: Filter =
     Filter::Sql("SELECT * FROM game_history WHERE player = :sender");
 
-#[spacetimedb::table(name = auto_delete_game_history_timer, scheduled(auto_delete_game_history))]
+#[spacetimedb::table(accessor = auto_delete_game_history_timer, scheduled(auto_delete_game_history))]
 pub struct AutoDeleteGameHistoryTimer {
     #[primary_key]
     scheduled_id: u64,
@@ -201,7 +204,7 @@ fn auto_delete_game_history(ctx: &ReducerContext, _timer: AutoDeleteGameHistoryT
     }
 }
 
-#[table(name = stats_one_month, public)]
+#[table(accessor = stats_one_month, public)]
 pub struct StatsOneMonth {
     #[primary_key]
     player: Identity,
@@ -209,7 +212,7 @@ pub struct StatsOneMonth {
     total: u32,
 }
 
-#[table(name = room, public)]
+#[table(accessor = room, public)]
 pub struct Room {
     #[primary_key]
     #[auto_inc]
@@ -238,7 +241,7 @@ fn delete_room(ctx: &ReducerContext, by: DeleteRoomBy) {
     }
 }
 
-#[table(name = room_password)]
+#[table(accessor = room_password)]
 pub struct RoomPassword {
     #[primary_key]
     room_id: u32,
@@ -257,7 +260,7 @@ fn delete_room_password(ctx: &ReducerContext, by: DeleteRoomPasswordBy) {
     }
 }
 
-#[table(name = message, public)]
+#[table(accessor = message, public)]
 pub struct Message {
     #[index(btree)]
     room_id: u32,
@@ -279,7 +282,7 @@ fn delete_message(ctx: &ReducerContext, by: DeleteMessageBy) {
     }
 }
 
-#[table(name = join_room, public)]
+#[table(accessor = join_room, public)]
 pub struct JoinRoom {
     #[index(btree)]
     room_id: u32,
@@ -304,7 +307,7 @@ fn delete_join_room(ctx: &ReducerContext, by: DeleteJoinRoomBy) {
     }
 }
 
-#[table(name = has_dropped_piece_to_game, public, index(name=game_and_joiner, btree(columns = [game_id, joiner])))]
+#[table(accessor = has_dropped_piece_to_game, public, index(accessor = game_and_joiner, btree(columns = [game_id, joiner])))]
 pub struct HasDroppedPieceToGame {
     #[auto_inc]
     #[primary_key]
@@ -328,7 +331,7 @@ fn delete_has_dropped_piece_to_game(ctx: &ReducerContext, by: DeleteHasDroppedPi
     }
 }
 
-#[spacetimedb::table(name = auto_delete_room_timer, scheduled(auto_delete_room_if_all_offline))]
+#[spacetimedb::table(accessor = auto_delete_room_timer, scheduled(auto_delete_room_if_all_offline))]
 pub struct AutoDeleteRoomTimer {
     #[primary_key]
     #[auto_inc]
@@ -358,12 +361,12 @@ fn auto_delete_room_if_all_offline(ctx: &ReducerContext, _timer: AutoDeleteRoomT
 }
 
 fn leave_team(ctx: &ReducerContext) {
-    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender) else {
+    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender()) else {
         // player was not in a game
         return;
     };
 
-    delete_join_team(ctx, DeleteJoinTeamBy::Joiner(ctx.sender));
+    delete_join_team(ctx, DeleteJoinTeamBy::Joiner(ctx.sender()));
 
     // remove game if there are no player in all teams
     // TODO: Maybe in the future we could keep the game alive as long as there are players in the room.
@@ -457,7 +460,7 @@ fn check_win(table: &GameTable, team_id: u32) -> Option<Vec<Coord>> {
 }
 
 fn game_of_sender(ctx: &ReducerContext) -> Result<Game, String> {
-    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender) else {
+    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender()) else {
         return Err("Player not in a team".to_string());
     };
 
@@ -584,7 +587,7 @@ fn game_switch_team(
 #[reducer]
 pub fn drop_piece(ctx: &ReducerContext, column: u32) -> Result<(), String> {
     // check if the player is in a team
-    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender) else {
+    let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender()) else {
         return Err("Cannot drop piece if not in a team".to_string());
     };
 
@@ -620,7 +623,7 @@ pub fn drop_piece(ctx: &ReducerContext, column: u32) -> Result<(), String> {
         if game.table[i][col_usize].is_none() {
             game.table[i][col_usize] = Some(DroppedPiece {
                 team_id: jt.team_id,
-                dropper: ctx.sender,
+                dropper: ctx.sender(),
             });
             game.latest_move = Some(Coord {
                 x: i as u32,
@@ -632,7 +635,7 @@ pub fn drop_piece(ctx: &ReducerContext, column: u32) -> Result<(), String> {
                 .try_insert(HasDroppedPieceToGame {
                     id: 0,
                     game_id: game.room_id,
-                    joiner: ctx.sender,
+                    joiner: ctx.sender(),
                     team_id: jt.team_id,
                 })?;
 
@@ -657,7 +660,7 @@ pub fn drop_piece(ctx: &ReducerContext, column: u32) -> Result<(), String> {
 
 fn validate_can_join_or_create(ctx: &ReducerContext) -> Result<JoinRoom, String> {
     // check if the player is in a room
-    let Some(jr) = ctx.db.join_room().joiner().find(ctx.sender) else {
+    let Some(jr) = ctx.db.join_room().joiner().find(ctx.sender()) else {
         return Err("Cannot join the game when not in a room".to_string());
     };
 
@@ -703,7 +706,7 @@ pub fn create_game(ctx: &ReducerContext) -> Result<(), String> {
 
     ctx.db.join_team().try_insert(JoinTeam {
         room_id: jr.room_id,
-        joiner: ctx.sender,
+        joiner: ctx.sender(),
         team_id: team1.id,
     })?;
 
@@ -722,14 +725,14 @@ pub fn join_to_team(ctx: &ReducerContext, team_id: u32) -> Result<(), String> {
         .db
         .has_dropped_piece_to_game()
         .game_and_joiner()
-        .filter((jr.room_id, ctx.sender))
+        .filter((jr.room_id, ctx.sender()))
         .next()
         .is_some()
     {
         return Err("Cannot change team after dropping a piece".to_string());
     }
 
-    if let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender) {
+    if let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender()) {
         if jt.team_id == team.id {
             return Err("Cannot join to the same team".to_string());
         }
@@ -740,7 +743,7 @@ pub fn join_to_team(ctx: &ReducerContext, team_id: u32) -> Result<(), String> {
     } else {
         ctx.db.join_team().try_insert(JoinTeam {
             room_id: jr.room_id,
-            joiner: ctx.sender,
+            joiner: ctx.sender(),
             team_id: team.id,
         })?;
     }
@@ -751,10 +754,10 @@ pub fn join_to_team(ctx: &ReducerContext, team_id: u32) -> Result<(), String> {
 #[reducer]
 pub fn send_message(ctx: &ReducerContext, text: String) -> Result<(), String> {
     validate_message_text(&text)?;
-    if let Some(jr) = ctx.db.join_room().joiner().find(ctx.sender) {
+    if let Some(jr) = ctx.db.join_room().joiner().find(ctx.sender()) {
         ctx.db.message().try_insert(Message {
             room_id: jr.room_id,
-            sender: ctx.sender,
+            sender: ctx.sender(),
             sent_at: ctx.timestamp,
             text,
         })?;
@@ -804,7 +807,7 @@ pub fn create_room(
         .db
         .player()
         .identity()
-        .find(ctx.sender)
+        .find(ctx.sender())
         .ok_or("Cannot find player")?;
     if player.name.is_none() {
         return Err("Cannot create a room without a name".to_string());
@@ -813,7 +816,7 @@ pub fn create_room(
         id: 0,
         title,
         created_at: ctx.timestamp,
-        owner: ctx.sender,
+        owner: ctx.sender(),
         has_password: password.is_some(),
     })?;
 
@@ -834,7 +837,7 @@ fn rejoin_previous_team(ctx: &ReducerContext, room_id: u32) -> Result<(), String
         .db
         .has_dropped_piece_to_game()
         .game_and_joiner()
-        .filter((room_id, ctx.sender))
+        .filter((room_id, ctx.sender()))
         .next();
 
     let Some(previous_drop) = previous_drop else {
@@ -855,11 +858,11 @@ fn rejoin_previous_team(ctx: &ReducerContext, room_id: u32) -> Result<(), String
     }
 
     // Force them to join the same team if they are not already in a team
-    let already_in_team = ctx.db.join_team().joiner().find(ctx.sender).is_some();
+    let already_in_team = ctx.db.join_team().joiner().find(ctx.sender()).is_some();
     if !already_in_team {
         ctx.db.join_team().try_insert(JoinTeam {
             room_id,
-            joiner: ctx.sender,
+            joiner: ctx.sender(),
             team_id: previous_drop.team_id,
         })?;
     }
@@ -873,7 +876,7 @@ pub fn join_to_room(
     room_id: u32,
     password: Option<String>,
 ) -> Result<(), String> {
-    if ctx.db.join_room().joiner().find(&ctx.sender).is_some() {
+    if ctx.db.join_room().joiner().find(&ctx.sender()).is_some() {
         Err("Cannot join to a room when already in one".to_string())
     } else {
         let _room = ctx
@@ -895,14 +898,14 @@ pub fn join_to_room(
             .db
             .player()
             .identity()
-            .find(ctx.sender)
+            .find(ctx.sender())
             .ok_or("Cannot find player")?;
         if player.name.is_none() {
             return Err("Cannot join to a room without a name".to_string());
         }
         ctx.db.join_room().try_insert(JoinRoom {
             room_id,
-            joiner: ctx.sender,
+            joiner: ctx.sender(),
             joined_at: ctx.timestamp,
         })?;
 
@@ -914,9 +917,9 @@ pub fn join_to_room(
 
 #[reducer]
 pub fn leave_room(ctx: &ReducerContext) {
-    delete_join_room(ctx, DeleteJoinRoomBy::Joiner(ctx.sender));
+    delete_join_room(ctx, DeleteJoinRoomBy::Joiner(ctx.sender()));
     leave_team(ctx);
-    if let Some(room) = ctx.db.room().owner().find(ctx.sender) {
+    if let Some(room) = ctx.db.room().owner().find(ctx.sender()) {
         if let Some(other_jr) = ctx.db.join_room().room_id().filter(room.id).next() {
             // Promote the next player to owner
             ctx.db.room().id().update(Room {
@@ -954,16 +957,16 @@ pub fn init(ctx: &ReducerContext) -> Result<(), String> {
 
 #[reducer(client_connected)]
 pub fn identity_connected(ctx: &ReducerContext) {
-    info!("Client connected: {:?}", ctx.sender);
+    info!("Client connected: {:?}", ctx.sender());
     // Called every time a new client connects
-    if let Some(player) = ctx.db.player().identity().find(ctx.sender) {
+    if let Some(player) = ctx.db.player().identity().find(ctx.sender()) {
         ctx.db.player().identity().update(Player {
             online: true,
             ..player
         });
     } else {
         ctx.db.player().insert(Player {
-            identity: ctx.sender,
+            identity: ctx.sender(),
             name: None,
             online: true,
         });
@@ -973,7 +976,7 @@ pub fn identity_connected(ctx: &ReducerContext) {
 #[reducer(client_disconnected)]
 pub fn identity_disconnected(ctx: &ReducerContext) {
     // Called every time a client disconnects
-    if let Some(player) = ctx.db.player().identity().find(ctx.sender) {
+    if let Some(player) = ctx.db.player().identity().find(ctx.sender()) {
         ctx.db.player().identity().update(Player {
             online: false,
             ..player
@@ -981,7 +984,7 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
     } else {
         log::warn!(
             "Disconnected player not found in database with identity {:?}",
-            ctx.sender
+            ctx.sender()
         );
     }
 }
@@ -989,7 +992,7 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
 #[reducer]
 pub fn set_name(ctx: &ReducerContext, name: String) -> Result<(), String> {
     let name = validate_name(name)?;
-    if let Some(player) = ctx.db.player().identity().find(ctx.sender) {
+    if let Some(player) = ctx.db.player().identity().find(ctx.sender()) {
         ctx.db.player().identity().update(Player {
             name: Some(name),
             ..player
@@ -1011,7 +1014,7 @@ fn validate_name(name: String) -> Result<String, String> {
 
 #[reducer]
 pub fn hello(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Hello from {:?}", ctx.sender);
+    log::info!("Hello from {:?}", ctx.sender());
     Ok(())
 }
 
@@ -1021,6 +1024,6 @@ pub fn hello_with_text(ctx: &ReducerContext, text: String) -> Result<(), String>
         return Err("Text must not be empty".to_string());
     }
 
-    log::info!("Hello from {:?} with text: {}", ctx.sender, text);
+    log::info!("Hello from {:?} with text: {}", ctx.sender(), text);
     Ok(())
 }

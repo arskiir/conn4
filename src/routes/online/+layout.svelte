@@ -4,7 +4,7 @@
 	import { DbConnection, type ErrorContext, Player } from '../../module_bindings';
 	import type { You } from '$lib';
 	import { SvelteMap } from 'svelte/reactivity';
-	import { Identity } from '@clockworklabs/spacetimedb-sdk';
+	import { Identity } from 'spacetimedb';
 	import { getContext, setContext } from 'svelte';
 
 	const firebaseConfig = {
@@ -39,7 +39,7 @@
 	const commonConnectionBuild = () => {
 		return DbConnection.builder()
 			.withUri(import.meta.env.VITE_SPACETIME_DB_URI ?? 'ws://localhost:3000')
-			.withModuleName(import.meta.env.VITE_SPACETIME_DB_MODULE ?? 'conn4')
+			.withDatabaseName(import.meta.env.VITE_SPACETIME_DB_MODULE ?? 'conn4')
 			.onConnectError(onConnectError);
 	};
 
@@ -50,8 +50,8 @@
 			.subscriptionBuilder()
 			.onApplied(async () => {
 				for (const player of conn.db.player.iter()) {
-					players.set(player.identity.data, player);
-					if (player.identity.data === yourIdentity.data) {
+					players.set(player.identity.__identity__, player);
+					if (player.identity.equals(yourIdentity)) {
 						you = {
 							name: player.name,
 							identity: player.identity
@@ -62,16 +62,16 @@
 			.subscribe(['SELECT * FROM player']);
 
 		conn.db.player.onInsert((ctx, player) => {
-			players.set(player.identity.data, player);
+			players.set(player.identity.__identity__, player);
 		});
 		conn.db.player.onUpdate((ctx, o, n) => {
-			players.set(n.identity.data, n);
-			if (n.identity.data === you?.identity.data) {
+			players.set(n.identity.__identity__, n);
+			if (n.identity.__identity__ === you?.identity.__identity__) {
 				you = { name: n.name, identity: n.identity };
 			}
 		});
 		conn.db.player.onDelete((ctx, player) => {
-			players.delete(player.identity.data);
+			players.delete(player.identity.__identity__);
 		});
 	};
 
