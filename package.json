@@ -6,7 +6,7 @@
 	"packageManager": "pnpm@11.10.0",
 	"scripts": {
 		"dev": "vite dev",
-		"dev:all": "pnpm run db & pnpm run dev",
+		"dev:all": "concurrently -n db,dev -c blue,green \"pnpm run db\" \"pnpm run dev\"",
 		"build": "vite build",
 		"preview": "vite preview",
 		"bp": "vite build && vite preview",
@@ -39,6 +39,7 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/svelte": "^5.2.4",
+		"concurrently": "^10.0.3",
 		"daisyui": "^5.0.43",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
