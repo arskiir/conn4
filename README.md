@@ -13,4 +13,4 @@
 
 ### Backend
 
-- [SpacetimeDB](https://spacetimedb.com/home)
+- [SpacetimeDB](https://spacetimedb.com/home) 2.6

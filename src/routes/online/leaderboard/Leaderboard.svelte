@@ -50,16 +50,16 @@
 					</td>
 				</tr>
 			{:else}
-				{#each lb.oneMonth.data as item, i (item.player.data)}
-					{@const p = players.get(item.player.data)}
+				{#each lb.oneMonth.data as item, i (item.player.__identity__)}
+					{@const p = players.get(item.player.__identity__)}
 					{@const nameStatus = p
 						? { name: p.name ?? '(???)', online: p.online }
 						: { name: '(???)', online: false }}
-					{@const isYou = you.identity.data === item.player.data}
+					{@const isYou = you.identity.__identity__ === item.player.__identity__}
 					<tr
 						animate:flip
-						in:receive={{ key: item.player.data }}
-						out:send={{ key: item.player.data }}
+						in:receive={{ key: item.player.__identity__ }}
+						out:send={{ key: item.player.__identity__ }}
 					>
 						<th>{i + 1}</th>
 						<td
