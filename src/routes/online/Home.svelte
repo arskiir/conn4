@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { You } from '$lib';
 	import { SenderError } from 'spacetimedb';
-	import type { DbConnection, Room } from '../../module_bindings';
+	import type { DbConnection, Room } from '$lib/bindings';
 	import { UseRooms } from './UseRooms.svelte';
 	import { m } from '$lib/paraglide/messages';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { DbConnection, Player } from '../../../module_bindings';
+	import type { DbConnection, Player } from '$lib/bindings';
 	import { UseLeaderboard } from '../UseLeaderboard.svelte';
 	import type { SvelteMap } from 'svelte/reactivity';
 	import { m } from '$lib/paraglide/messages';

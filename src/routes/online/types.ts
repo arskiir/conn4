@@ -1,6 +1,6 @@
 import type { You } from '$lib';
 import type { SvelteMap } from 'svelte/reactivity';
-import type { DbConnection, Player } from '../../module_bindings';
+import type { DbConnection, Player } from '$lib/bindings';
 
 export type RoomData = {
 	players: SvelteMap<bigint, Player>;

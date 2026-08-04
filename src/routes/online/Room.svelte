@@ -2,7 +2,7 @@
 	import type { GameUIDataProps } from '$lib/GameUI.svelte';
 	import GameUi from '$lib/GameUI.svelte';
 	import { fly } from 'svelte/transition';
-	import { type EventContext, JoinRoom } from '../../module_bindings';
+	import { type EventContext, JoinRoom } from '$lib/bindings';
 	import type { RoomData } from './types';
 	import { UseGame } from './UseGame.svelte';
 	import { UseRoom } from './UseRoom.svelte';

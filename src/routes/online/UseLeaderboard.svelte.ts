@@ -1,5 +1,4 @@
-import type { StatsOneMonth } from '../../module_bindings/types';
-import type { DbConnection, EventContext } from '../../module_bindings';
+import type { DbConnection, EventContext, StatsOneMonth } from '$lib/bindings';
 import type { SubscriptionHandle } from '$lib';
 
 export class UseLeaderboard {

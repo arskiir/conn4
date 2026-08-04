@@ -1,5 +1,5 @@
 import type { SubscriptionHandle } from '$lib';
-import type { DbConnection, EventContext, Message } from '../../module_bindings';
+import type { DbConnection, EventContext, Message } from '$lib/bindings';
 
 export class UseRoomMessages {
 	private _messages = $state<Message[]>([]);

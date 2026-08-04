@@ -10,7 +10,7 @@
 		getAuth
 	} from 'firebase/auth';
 	import { GoogleAuthProvider } from 'firebase/auth';
-	import { type EventContext, type JoinRoom } from '../../module_bindings';
+	import { type EventContext, type JoinRoom } from '$lib/bindings';
 	import type { SubscriptionHandle, You } from '$lib';
 	import Home from './Home.svelte';
 	import type { RoomData } from './types';

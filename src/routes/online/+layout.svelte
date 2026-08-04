@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	import { initializeApp } from 'firebase/app';
 	import { getAuth, onAuthStateChanged, type User } from 'firebase/auth';
-	import { DbConnection, type ErrorContext, Player } from '../../module_bindings';
+	import { DbConnection, type ErrorContext, Player } from '$lib/bindings';
 	import type { You } from '$lib';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { Identity } from 'spacetimedb';

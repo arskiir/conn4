@@ -1,5 +1,5 @@
 import type { Identity } from 'spacetimedb';
-import type { SubscriptionHandle } from '../module_bindings';
+import type { SubscriptionHandle } from '$lib/bindings';
 
 // place files you want to import through the `$lib` alias in this folder.
 export type { SubscriptionHandle };
