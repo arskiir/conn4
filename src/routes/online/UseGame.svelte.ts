@@ -68,7 +68,8 @@ export class UseGame {
 	}
 
 	private readonly teamHandle: SubscriptionHandle;
-	private teamOnInsert: (ctx: EventContext, team: Team) => void;
+	private readonly teamOnInsert: (ctx: EventContext, team: Team) => void;
+	private readonly teamOnDelete: (ctx: EventContext, team: Team) => void;
 	private _teams = $state<Team[]>([]);
 	get teams() {
 		return this._teams;
@@ -89,6 +90,10 @@ export class UseGame {
 		newRow: GameCurrentTeam
 	) => void;
 	private readonly gameCurrentTeamOnInsert: (
+		ctx: EventContext,
+		gameCurrentTeam: GameCurrentTeam
+	) => void;
+	private readonly gameCurrentTeamOnDelete: (
 		ctx: EventContext,
 		gameCurrentTeam: GameCurrentTeam
 	) => void;
@@ -227,11 +232,15 @@ export class UseGame {
 		this.gameCurrentTeamOnUpdate = (ctx, _, n) => {
 			this._gameCurrentTeam = n;
 		};
-		conn.db.game_current_team.onUpdate(this.gameCurrentTeamOnUpdate);
 		this.gameCurrentTeamOnInsert = (ctx, gameCurrentTeam) => {
 			this._gameCurrentTeam = gameCurrentTeam;
 		};
+		this.gameCurrentTeamOnDelete = (_ctx) => {
+			this._gameCurrentTeam = null;
+		};
+		conn.db.game_current_team.onUpdate(this.gameCurrentTeamOnUpdate);
 		conn.db.game_current_team.onInsert(this.gameCurrentTeamOnInsert);
+		conn.db.game_current_team.onDelete(this.gameCurrentTeamOnDelete);
 
 		this.subscriptions++;
 		this.gameCurrentTeamHandle = conn
@@ -239,9 +248,7 @@ export class UseGame {
 			.onApplied(() => {
 				this.activeSubscriptions++;
 				const currentTeam = Array.from(conn.db.game_current_team.iter())[0];
-				if (currentTeam) {
-					this._gameCurrentTeam = currentTeam;
-				}
+				this._gameCurrentTeam = currentTeam ?? null;
 			})
 			.onError((ctx) => {
 				console.error('Error fetching game current team:', ctx.event);
@@ -249,6 +256,9 @@ export class UseGame {
 			.subscribe(`SELECT * FROM game_current_team WHERE game_id = '${roomId}'`);
 
 		this.teamOnInsert = (ctx, team) => {
+			if (this._teams.some((t) => t.id === team.id)) {
+				return;
+			}
 			this._teams.push(team);
 			if (this._teams.length > 2) {
 				throw new Error(
@@ -257,20 +267,21 @@ export class UseGame {
 			}
 			this._teams.sort((a, b) => a.id - b.id);
 		};
+		this.teamOnDelete = (ctx, team) => {
+			const index = this._teams.findIndex((t) => t.id === team.id);
+			if (index !== -1) {
+				this._teams.splice(index, 1);
+			}
+		};
+		conn.db.team.onInsert(this.teamOnInsert);
+		conn.db.team.onDelete(this.teamOnDelete);
 
 		this.subscriptions++;
 		this.teamHandle = conn
 			.subscriptionBuilder()
 			.onApplied(() => {
 				this.activeSubscriptions++;
-				const teams = Array.from(conn.db.team.iter());
-				if (teams.length) {
-					// joined into a room when there are teams (there is a game)
-					this._teams = teams;
-				} else {
-					// joined a room when there is no team (there is no game yet)
-					conn.db.team.onInsert(this.teamOnInsert);
-				}
+				this._teams = Array.from(conn.db.team.iter());
 			})
 			.onError((ctx) => {
 				console.error('Error fetching teams:', ctx.event);
@@ -335,6 +346,15 @@ export class UseGame {
 		}
 	}
 
+	async leaveTeam() {
+		this._gameJoining = true;
+		try {
+			await this.conn.reducers.leaveTeam({});
+		} finally {
+			this._gameJoining = false;
+		}
+	}
+
 	private stopGame() {
 		const removeListeners = () => {
 			this.conn.db.game.removeOnUpdate(this.gameOnUpdate);
@@ -379,6 +399,7 @@ export class UseGame {
 		const removeListeners = () => {
 			this.conn.db.game_current_team.removeOnUpdate(this.gameCurrentTeamOnUpdate);
 			this.conn.db.game_current_team.removeOnInsert(this.gameCurrentTeamOnInsert);
+			this.conn.db.game_current_team.removeOnDelete(this.gameCurrentTeamOnDelete);
 		};
 
 		return new Promise<void>((resolve) => {
@@ -397,6 +418,7 @@ export class UseGame {
 	private stopTeam() {
 		const removeListeners = () => {
 			this.conn.db.team.removeOnInsert(this.teamOnInsert);
+			this.conn.db.team.removeOnDelete(this.teamOnDelete);
 		};
 
 		return new Promise<void>((resolve) => {

@@ -18,6 +18,7 @@
 	"save": "保存",
 	"room_name": "ルーム名",
 	"leave": "退出",
+	"leave_team": "観戦に戻る",
 	"waiting_another_player_to_join": "他のチームを待っています。",
 	"join_game": "チーム{name}",
 	"waiting_for_player_to_join": "プレイヤーを待っています。",

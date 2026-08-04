@@ -42,6 +42,7 @@ import HelloWithTextReducer from "./hello_with_text_reducer";
 import JoinToRoomReducer from "./join_to_room_reducer";
 import JoinToTeamReducer from "./join_to_team_reducer";
 import LeaveRoomReducer from "./leave_room_reducer";
+import LeaveTeamReducer from "./leave_team_reducer";
 import RestartGameHasWinnerReducer from "./restart_game_has_winner_reducer";
 import RestartGameTableFullReducer from "./restart_game_table_full_reducer";
 import SendMessageReducer from "./send_message_reducer";
@@ -231,6 +232,7 @@ const reducersSchema = __reducers(
   __reducerSchema("join_to_room", JoinToRoomReducer),
   __reducerSchema("join_to_team", JoinToTeamReducer),
   __reducerSchema("leave_room", LeaveRoomReducer),
+  __reducerSchema("leave_team", LeaveTeamReducer),
   __reducerSchema("restart_game_has_winner", RestartGameHasWinnerReducer),
   __reducerSchema("restart_game_table_full", RestartGameTableFullReducer),
   __reducerSchema("send_message", SendMessageReducer),

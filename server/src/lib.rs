@@ -360,7 +360,8 @@ fn auto_delete_room_if_all_offline(ctx: &ReducerContext, _timer: AutoDeleteRoomT
     }
 }
 
-fn leave_team(ctx: &ReducerContext) {
+#[reducer]
+pub fn leave_team(ctx: &ReducerContext) {
     let Some(jt) = ctx.db.join_team().joiner().find(ctx.sender()) else {
         // player was not in a game
         return;

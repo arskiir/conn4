@@ -264,16 +264,23 @@
 						{restarting}
 						{dropping}
 					/>
-					{#if useGame.oppositeTeam && !readyGameState.winner}
-						{@const oppositeTeam = useGame.oppositeTeam}
+					<div class="flex flex-wrap justify-center gap-2">
+						{#if useGame.oppositeTeam && !readyGameState.winner}
+							{@const oppositeTeam = useGame.oppositeTeam}
+							<button
+								transition:fly={{ y: -10, duration: 150 }}
+								disabled={useGame.gameJoining || useGame.hasDroppedPieceToGames}
+								onclick={() => useGame.joinTeam(oppositeTeam.id)}
+								class="btn btn-primary btn-sm md:btn-md"
+								>{m.steep_large_snail_catch({ name: oppositeTeam.name })}</button
+							>
+						{/if}
 						<button
-							transition:fly={{ y: -10, duration: 150 }}
-							disabled={useGame.gameJoining || useGame.hasDroppedPieceToGames}
-							onclick={() => useGame.joinTeam(oppositeTeam.id)}
-							class="btn btn-primary btn-sm md:btn-md"
-							>{m.steep_large_snail_catch({ name: oppositeTeam.name })}</button
+							disabled={useGame.gameJoining}
+							onclick={() => useGame.leaveTeam()}
+							class="btn btn-ghost btn-sm md:btn-md">{m.leave_team()}</button
 						>
-					{/if}
+					</div>
 				</div>
 			{:else}
 				<!-- You are watching a match as a spectator. -->
