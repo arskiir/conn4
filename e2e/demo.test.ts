@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('home page has expected h1', async ({ page }) => {
+test('home page redirects to the offline game', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.locator('h1')).toBeVisible();
+	await expect(page).toHaveURL(/\/offline/);
+	await expect(page.getByText('Player 1')).toBeVisible();
+	await expect(page.getByText('Player 2')).toBeVisible();
 });
