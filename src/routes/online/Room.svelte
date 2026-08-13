@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { GameUIDataProps } from '$lib/GameUI.svelte';
-	import GameUi from '$lib/GameUI.svelte';
+	import type { GameUIDataProps } from '#lib/GameUI.svelte';
+	import GameUi from '#lib/GameUI.svelte';
 	import { fly } from 'svelte/transition';
-	import { type EventContext, JoinRoom } from '$lib/bindings';
+	import { type EventContext, JoinRoom } from '#lib/bindings.js';
 	import type { RoomData } from './types';
 	import { UseGame } from './UseGame.svelte';
 	import { UseRoom } from './UseRoom.svelte';
 	import { flip } from 'svelte/animate';
 	import { UseRoomMessages } from './UseRoomMessages.svelte';
-	import { m } from '$lib/paraglide/messages';
+	import { m } from '#lib/paraglide/messages.js';
 
 	let { conn, players, roomId, initialRoomTitle, you, leaveRoom }: RoomData = $props();
 

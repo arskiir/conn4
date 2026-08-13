@@ -1,5 +1,5 @@
-import { SubscriptionHandle } from '$lib';
-import { Room, DbConnection, type EventContext } from '$lib/bindings';
+import type { SubscriptionHandle } from '#lib';
+import { Room, DbConnection, type EventContext } from '#lib/bindings.js';
 
 export class UseRooms {
 	private _rooms = $state<Room[]>([]);

@@ -1,5 +1,5 @@
-import type { DbConnection, EventContext, StatsOneMonth } from '$lib/bindings';
-import type { SubscriptionHandle } from '$lib';
+import type { DbConnection, EventContext, StatsOneMonth } from '#lib/bindings.js';
+import type { SubscriptionHandle } from '#lib';
 
 export class UseLeaderboard {
 	public oneMonth = $state<

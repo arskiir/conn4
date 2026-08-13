@@ -1,5 +1,5 @@
-import type { SubscriptionHandle } from '$lib';
-import type { DbConnection, EventContext, Message } from '$lib/bindings';
+import type { SubscriptionHandle } from '#lib';
+import type { DbConnection, EventContext, Message } from '#lib/bindings.js';
 
 export class UseRoomMessages {
 	private _messages = $state<Message[]>([]);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { LocalPlayer } from '$lib/local-game.svelte';
+	import type { LocalPlayer } from '#lib/local-game.svelte.ts';
 	import { fly, scale, slide, fade } from 'svelte/transition';
 	import { expoInOut, expoOut } from 'svelte/easing';
 	import { m } from './paraglide/messages';

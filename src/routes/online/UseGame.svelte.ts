@@ -1,4 +1,4 @@
-import { SubscriptionHandle } from '$lib';
+import type { SubscriptionHandle } from '#lib';
 import type { Identity } from 'spacetimedb';
 import type {
 	DbConnection,
@@ -8,7 +8,7 @@ import type {
 	HasDroppedPieceToGame,
 	JoinTeam,
 	Team
-} from '$lib/bindings';
+} from '#lib/bindings.js';
 
 export class UseGame {
 	// TODO: Try to refactor so that we can do some union type i.e. if loading is true, game is undefined, if not game is Game or null. Maybe we need to convert the class to a function that returns an object with the correct types.

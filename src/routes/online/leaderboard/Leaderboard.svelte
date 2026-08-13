@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { DbConnection, Player } from '$lib/bindings';
+	import type { DbConnection, Player } from '#lib/bindings.js';
 	import { UseLeaderboard } from '../UseLeaderboard.svelte';
 	import type { SvelteMap } from 'svelte/reactivity';
-	import { m } from '$lib/paraglide/messages';
+	import { m } from '#lib/paraglide/messages.js';
 	import { flip } from 'svelte/animate';
-	import { useCrossfade } from '$lib/transitions';
+	import { useCrossfade } from '#lib/transitions.js';
 	import PlayerNameWithStatus from '../PlayerNameWithStatus.svelte';
-	import type { You } from '$lib';
+	import type { You } from '#lib';
 
 	let { conn, players, you }: { conn: DbConnection; players: SvelteMap<bigint, Player>; you: You } =
 		$props();

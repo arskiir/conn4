@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { You } from '$lib';
+	import type { You } from '#lib';
 	import { SenderError } from 'spacetimedb';
-	import type { DbConnection, Room } from '$lib/bindings';
+	import type { DbConnection, Room } from '#lib/bindings.js';
 	import { UseRooms } from './UseRooms.svelte';
-	import { m } from '$lib/paraglide/messages';
+	import { m } from '#lib/paraglide/messages.js';
 
 	// Modal IDs
 	const CREATE_ROOM_MODAL_ID = 'create_room_modal';

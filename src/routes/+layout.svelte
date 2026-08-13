@@ -2,8 +2,8 @@
 	import '../app.css';
 	let { children } = $props();
 	import { page } from '$app/state';
-	import { m } from '$lib/paraglide/messages';
-	import { getLocale, setLocale } from '$lib/paraglide/runtime';
+	import { m } from '#lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '#lib/paraglide/runtime.js';
 
 	const pages = [
 		{ pathname: '/offline', label: m.this_teary_hyena_value(), icon: '😪' },

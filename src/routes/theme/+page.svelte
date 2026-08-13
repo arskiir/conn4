@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { themes } from '$lib/themes';
+	import { themes } from '#lib/themes.js';
 </script>
 
 <div class="flex max-w-[44rem] flex-wrap justify-center gap-2 transition-all">

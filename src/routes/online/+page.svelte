@@ -10,13 +10,13 @@
 		getAuth
 	} from 'firebase/auth';
 	import { GoogleAuthProvider } from 'firebase/auth';
-	import { type EventContext, type JoinRoom } from '$lib/bindings';
-	import type { SubscriptionHandle, You } from '$lib';
+	import { type EventContext, type JoinRoom } from '#lib/bindings.js';
+	import type { SubscriptionHandle, You } from '#lib';
 	import Home from './Home.svelte';
 	import type { RoomData } from './types';
 	import Room from './Room.svelte';
 	import GoogleLoginButton from './GoogleLoginButton.svelte';
-	import { m } from '$lib/paraglide/messages';
+	import { m } from '#lib/paraglide/messages.js';
 	import FacebookLoginButton from './FacebookLoginButton.svelte';
 	import GitHubLoginButton from './GitHubLoginButton.svelte';
 	import XLoginButton from './XLoginButton.svelte';

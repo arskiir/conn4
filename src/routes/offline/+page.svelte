@@ -1,7 +1,7 @@
 <script lang="ts" module>
-	import GameUi from '$lib/GameUI.svelte';
-	import { createLocalGame } from '$lib/local-game.svelte';
-	import { m } from '$lib/paraglide/messages';
+	import GameUi from '#lib/GameUI.svelte';
+	import { createLocalGame } from '#lib/local-game.svelte.ts';
+	import { m } from '#lib/paraglide/messages.js';
 
 	const game = createLocalGame({
 		players: [
